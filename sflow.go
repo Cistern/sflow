@@ -74,7 +74,11 @@ func listen() {
 
 	buf := make([]byte, 65535)
 	for {
-		n, _, _ := conn.ReadFromUDP(buf)
-		fmt.Printf("%+v\n=================\n=================\n", DecodeDatagram(buf[0:n-1]))
+		n, _, err := conn.ReadFromUDP(buf)
+		if err == nil {
+			fmt.Printf("%+v\n=================\n=================\n", DecodeDatagram(buf[0:n]))
+		} else {
+			fmt.Println(err)
+		}
 	}
 }
