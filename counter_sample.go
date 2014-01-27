@@ -143,14 +143,6 @@ func (s CounterSample) Records() []Record {
 	return s.records
 }
 
-func (e EthIfaceCounters) Data() []byte {
-	return []byte{}
-}
-
-func (g GenericIfaceCounters) Data() []byte {
-	return []byte{}
-}
-
 func decodeEthernetRecord(f io.Reader) EthIfaceCounters {
 	e := EthIfaceCounters{}
 	binary.Read(f, binary.BigEndian, &e)
@@ -159,6 +151,30 @@ func decodeEthernetRecord(f io.Reader) EthIfaceCounters {
 
 func decodeGenericIfaceRecord(f io.Reader) GenericIfaceCounters {
 	e := GenericIfaceCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeVgRecord(f io.Reader) VgCounters {
+	e := VgCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeTokenRingRecord(f io.Reader) TokenRingCounters {
+	e := TokenRingCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeVlanRecord(f io.Reader) VlanCounters {
+	e := VlanCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeProcessorRecord(f io.Reader) ProcessorInfo {
+	e := ProcessorInfo{}
 	binary.Read(f, binary.BigEndian, &e)
 	return e
 }
@@ -179,6 +195,14 @@ func DecodeCounterSample(f io.Reader) Sample {
 			sample.records = append(sample.records, decodeEthernetRecord(f))
 		case TypeGenericIface:
 			sample.records = append(sample.records, decodeGenericIfaceRecord(f))
+		case TypeTokenRing:
+			sample.records = append(sample.records, decodeTokenRingRecord(f))
+		case TypeVg:
+			sample.records = append(sample.records, decodeVgRecord(f))
+		case TypeVlan:
+			sample.records = append(sample.records, decodeVlanRecord(f))
+		case TypeProcessor:
+			sample.records = append(sample.records, decodeProcessorRecord(f))
 		}
 	}
 

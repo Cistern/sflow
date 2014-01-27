@@ -11,7 +11,6 @@ type Sample interface {
 }
 
 type Record interface {
-	Data() []byte
 }
 
 // Sample types
