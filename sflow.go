@@ -43,6 +43,6 @@ func DecodeDatagramHeader(f *bytes.Reader) DatagramHeader {
 func main() {
 	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
 	packetReader := bytes.NewReader(packet)
-	fmt.Println(DecodeDatagramHeader(packetReader))
+	fmt.Printf("%+v\n", DecodeDatagramHeader(packetReader))
 	fmt.Println(DecodeSample(packetReader))
 }

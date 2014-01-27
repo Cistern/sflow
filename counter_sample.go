@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"fmt"
 	"io"
 )
 
@@ -16,6 +17,15 @@ type CounterRecordHeader struct {
 	DataFormat uint32
 	DataLength uint32
 }
+
+const (
+	TypeGenericIface = 1
+	TypeEthernet     = 2
+	TypeTokenRing    = 3
+	TypeVg           = 4
+	TypeVlan         = 5
+	TypeProcessor    = 1001
+)
 
 type GenericIfaceCounters struct {
 	Index            uint32
@@ -115,6 +125,16 @@ type CounterSample struct {
 	records []Record
 }
 
+func (c CounterSample) String() string {
+	out := ""
+	out += "Counter sample\n==========\n"
+	for _, record := range c.records {
+		out += fmt.Sprintf("%+v\n-------\n", record)
+	}
+
+	return out
+}
+
 func (s CounterSample) Sequence() uint32 {
 	return s.header.SequenceNum
 }
@@ -123,15 +143,44 @@ func (s CounterSample) Records() []Record {
 	return s.records
 }
 
+func (e EthIfaceCounters) Data() []byte {
+	return []byte{}
+}
+
+func (g GenericIfaceCounters) Data() []byte {
+	return []byte{}
+}
+
+func decodeEthernetRecord(f io.Reader) EthIfaceCounters {
+	e := EthIfaceCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeGenericIfaceRecord(f io.Reader) GenericIfaceCounters {
+	e := GenericIfaceCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
 func DecodeCounterSample(f io.Reader) Sample {
 	header := CounterSampleHeader{}
 	binary.Read(f, binary.BigEndian, &header)
-	cRH := CounterRecordHeader{}
-
-	binary.Read(f, binary.BigEndian, &cRH)
 
 	sample := CounterSample{}
 	sample.header = header
+
+	for i := uint32(0); i < header.CounterRecords; i++ {
+		cRH := CounterRecordHeader{}
+		binary.Read(f, binary.BigEndian, &cRH)
+
+		switch cRH.DataFormat {
+		case TypeEthernet:
+			sample.records = append(sample.records, decodeEthernetRecord(f))
+		case TypeGenericIface:
+			sample.records = append(sample.records, decodeGenericIfaceRecord(f))
+		}
+	}
 
 	return sample
 }
