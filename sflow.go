@@ -64,4 +64,17 @@ func DecodeDatagram(packet []byte) Datagram {
 func main() {
 	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
 	fmt.Printf("%+v\n", DecodeDatagram(packet))
+
+	listen()
+}
+
+func listen() {
+	udpAddr, _ := net.ResolveUDPAddr("udp", ":6343")
+	conn, _ := net.ListenUDP("udp", udpAddr)
+
+	buf := make([]byte, 65535)
+	for {
+		n, _, _ := conn.ReadFromUDP(buf)
+		fmt.Printf("%+v\n=================\n=================\n", DecodeDatagram(buf[0:n-1]))
+	}
 }

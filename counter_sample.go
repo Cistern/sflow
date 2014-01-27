@@ -126,7 +126,7 @@ type CounterSample struct {
 }
 
 func (c CounterSample) String() string {
-	out := ""
+	out := "\n"
 	out += "Counter sample\n==========\n"
 	for _, record := range c.records {
 		out += fmt.Sprintf("%+v\n-------\n", record)
