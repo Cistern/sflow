@@ -1,0 +1,6 @@
+sflow-go
+====
+
+License
+---
+MIT
