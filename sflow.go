@@ -8,6 +8,11 @@ import (
 	"net"
 )
 
+type Datagram struct {
+	Header  DatagramHeader
+	Samples []Sample
+}
+
 type DatagramHeader struct {
 	SflowVersion uint32
 	IpVersion    uint32
@@ -40,9 +45,23 @@ func DecodeDatagramHeader(f *bytes.Reader) DatagramHeader {
 	return header
 }
 
+func DecodeDatagram(packet []byte) Datagram {
+	packetReader := bytes.NewReader(packet)
+
+	d := Datagram{
+		Header: DecodeDatagramHeader(packetReader),
+	}
+	for i := uint32(0); i < d.Header.NumSamples; i++ {
+		s := DecodeSample(packetReader)
+		if s != nil {
+			d.Samples = append(d.Samples, s)
+		}
+	}
+
+	return d
+}
+
 func main() {
 	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
-	packetReader := bytes.NewReader(packet)
-	fmt.Printf("%+v\n", DecodeDatagramHeader(packetReader))
-	fmt.Println(DecodeSample(packetReader))
+	fmt.Printf("%+v\n", DecodeDatagram(packet))
 }
