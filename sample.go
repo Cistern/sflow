@@ -37,6 +37,8 @@ func DecodeSample(f io.Reader) Sample {
 	switch header.DataFormat {
 	case TypeCounterSample:
 		return DecodeCounterSample(f)
+	case TypeFlowSample:
+		return DecodeFlowSample(f)
 	}
 
 	return nil

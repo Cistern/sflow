@@ -19,12 +19,12 @@ type CounterRecordHeader struct {
 }
 
 const (
-	TypeGenericIface = 1
-	TypeEthernet     = 2
-	TypeTokenRing    = 3
-	TypeVg           = 4
-	TypeVlan         = 5
-	TypeProcessor    = 1001
+	TypeGenericIfaceCounter = 1
+	TypeEthernetCounter     = 2
+	TypeTokenRingCounter    = 3
+	TypeVgCounter           = 4
+	TypeVlanCounter         = 5
+	TypeProcessorCounter    = 1001
 )
 
 type GenericIfaceCounters struct {
@@ -191,17 +191,17 @@ func DecodeCounterSample(f io.Reader) Sample {
 		binary.Read(f, binary.BigEndian, &cRH)
 
 		switch cRH.DataFormat {
-		case TypeEthernet:
+		case TypeEthernetCounter:
 			sample.records = append(sample.records, decodeEthernetRecord(f))
-		case TypeGenericIface:
+		case TypeGenericIfaceCounter:
 			sample.records = append(sample.records, decodeGenericIfaceRecord(f))
-		case TypeTokenRing:
+		case TypeTokenRingCounter:
 			sample.records = append(sample.records, decodeTokenRingRecord(f))
-		case TypeVg:
+		case TypeVgCounter:
 			sample.records = append(sample.records, decodeVgRecord(f))
-		case TypeVlan:
+		case TypeVlanCounter:
 			sample.records = append(sample.records, decodeVlanRecord(f))
-		case TypeProcessor:
+		case TypeProcessorCounter:
 			sample.records = append(sample.records, decodeProcessorRecord(f))
 		}
 	}
