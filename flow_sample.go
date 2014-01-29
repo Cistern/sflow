@@ -18,19 +18,33 @@ type FlowSampleHeader struct {
 	FlowRecords      uint32
 }
 
+type FlowExpandedSampleHeader struct {
+	SequenceNum      uint32
+	SourceIdType     uint32
+	SourceIdIndexVal uint32
+	SamplingRate     uint32
+	SamplePool       uint32
+	Drops            uint32
+	Input            uint64
+	Output           uint64
+	FlowRecords      uint32
+}
+
 type FlowRecordHeader struct {
 	DataFormat uint32
 	DataLength uint32
 }
 
+type FlowSampleHeaderInterface interface{}
+
 type FlowSample struct {
-	header  FlowSampleHeader
+	header  FlowSampleHeaderInterface
 	records []Record
 }
 
 func (f FlowSample) String() string {
 	out := "\n"
-	out += "Flow sample\n==========\n"
+	out += fmt.Sprintf("Flow sample (%v records)\n==========\n", len(f.records))
 	for _, record := range f.records {
 		out += fmt.Sprintf("%+v\n-------\n", record)
 	}
@@ -43,7 +57,7 @@ func (f FlowSample) Records() []Record {
 }
 
 func (f FlowSample) Sequence() uint32 {
-	return f.header.SequenceNum
+	return 0
 }
 
 const (
@@ -121,7 +135,7 @@ func decodeRawPacketFlowRecord(f io.Reader) RawPacketFlowRecord {
 	binary.Read(f, binary.BigEndian, &r.Stripped)
 	binary.Read(f, binary.BigEndian, &r.HeaderSize)
 	r.Header = make([]byte, r.HeaderSize)
-	binary.Read(f, binary.BigEndian, &r.Header)
+	io.ReadFull(f, r.Header)
 	return r
 }
 
@@ -133,6 +147,32 @@ func decodeExtendedSwitchFlowRecord(f io.Reader) ExtendedSwitchFlowRecord {
 
 func DecodeFlowSample(f io.Reader) Sample {
 	header := FlowSampleHeader{}
+	binary.Read(f, binary.BigEndian, &header)
+
+	sample := FlowSample{}
+	sample.header = header
+
+	for i := uint32(0); i < header.FlowRecords; i++ {
+		fRH := FlowRecordHeader{}
+		binary.Read(f, binary.BigEndian, &fRH)
+		switch fRH.DataFormat {
+		case TypeIpv4Flow:
+			sample.records = append(sample.records, decodeIpv4FlowRecord(f))
+		case TypeRawPacketFlow:
+			sample.records = append(sample.records, decodeRawPacketFlowRecord(f))
+		case TypeExtendedSwitchFlow:
+			sample.records = append(sample.records, decodeExtendedSwitchFlowRecord(f))
+		default:
+			io.ReadFull(f, make([]byte, fRH.DataLength))
+			continue
+		}
+	}
+
+	return sample
+}
+
+func DecodeExpandedFlowSample(f io.Reader) Sample {
+	header := FlowExpandedSampleHeader{}
 	binary.Read(f, binary.BigEndian, &header)
 
 	sample := FlowSample{}

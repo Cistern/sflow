@@ -34,11 +34,16 @@ func DecodeSampleDataHeader(f io.Reader) SampleDataHeader {
 
 func DecodeSample(f io.Reader) Sample {
 	header := DecodeSampleDataHeader(f)
+
 	switch header.DataFormat {
 	case TypeCounterSample:
 		return DecodeCounterSample(f)
 	case TypeFlowSample:
 		return DecodeFlowSample(f)
+	case TypeExpandedFlowSample:
+		return DecodeExpandedFlowSample(f)
+	default:
+		return nil
 	}
 
 	return nil

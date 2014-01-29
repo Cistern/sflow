@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
 	"net"
 )
 
@@ -62,9 +61,6 @@ func DecodeDatagram(packet []byte) Datagram {
 }
 
 func main() {
-	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
-	fmt.Printf("%+v\n", DecodeDatagram(packet))
-
 	listen()
 }
 
@@ -73,8 +69,10 @@ func listen() {
 	conn, _ := net.ListenUDP("udp", udpAddr)
 
 	buf := make([]byte, 65535)
+
 	for {
 		n, _, err := conn.ReadFromUDP(buf)
+		fmt.Println(n, err)
 		if err == nil {
 			fmt.Printf("%+v\n=================\n=================\n", DecodeDatagram(buf[0:n]))
 		} else {
