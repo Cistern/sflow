@@ -6,10 +6,11 @@ import (
 )
 
 type Sample interface {
-	Type() int
+	SampleType() int
 }
 
 type Record interface {
+	RecordType() int
 }
 
 // Sample types
@@ -36,11 +37,11 @@ func DecodeSample(f io.ReadSeeker) Sample {
 
 	switch header.DataFormat {
 	case TypeCounterSample:
-		return DecodeCounterSample(f)
+		return decodeCounterSample(f)
 	case TypeFlowSample:
-		return DecodeFlowSample(f)
+		return decodeFlowSample(f)
 	case TypeExpandedFlowSample:
-		return DecodeExpandedFlowSample(f)
+		return decodeExpandedFlowSample(f)
 	default: // unknown sample type
 		f.Seek(int64(header.SampleLength), 1)
 		return nil

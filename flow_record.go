@@ -31,6 +31,18 @@ type ExtendedSwitchFlowRecord struct {
 	DestinationPriority uint32
 }
 
+func (r Ipv4FlowRecord) RecordType() int {
+	return TypeIpv4Flow
+}
+
+func (r RawPacketFlowRecord) RecordType() int {
+	return TypeRawPacketFlow
+}
+
+func (r ExtendedSwitchFlowRecord) RecordType() int {
+	return TypeExtendedSwitchFlow
+}
+
 func decodeIpv4FlowRecord(f io.Reader) Ipv4FlowRecord {
 	r := Ipv4FlowRecord{}
 	binary.Read(f, binary.BigEndian, &r)
