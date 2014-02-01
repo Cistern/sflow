@@ -43,7 +43,7 @@ func decodeDatagramHeader(f *bytes.Reader) DatagramHeader {
 	return header
 }
 
-func DecodeDatagram(packet []byte) Datagram {
+func Decode(packet []byte) Datagram {
 	packetReader := bytes.NewReader(packet)
 
 	d := Datagram{

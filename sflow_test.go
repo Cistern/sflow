@@ -7,7 +7,7 @@ import (
 
 func TestCounter(t *testing.T) {
 	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
-	d := DecodeDatagram(packet)
+	d := Decode(packet)
 	if d.Header.SflowVersion != 5 {
 		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
 	}
@@ -32,7 +32,7 @@ func TestCounter(t *testing.T) {
 
 func TestFlow(t *testing.T) {
 	packet, _ := ioutil.ReadFile("./_test/flow_sample.dump")
-	d := DecodeDatagram(packet)
+	d := Decode(packet)
 	if d.Header.SflowVersion != 5 {
 		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
 	}
