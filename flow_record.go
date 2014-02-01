@@ -1,4 +1,4 @@
-package main
+package sflow
 
 import (
 	"encoding/binary"

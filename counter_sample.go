@@ -1,4 +1,4 @@
-package main
+package sflow
 
 import (
 	"encoding/binary"
@@ -135,12 +135,8 @@ func (c CounterSample) String() string {
 	return out
 }
 
-func (s CounterSample) Sequence() uint32 {
-	return s.header.SequenceNum
-}
-
-func (s CounterSample) Records() []Record {
-	return s.records
+func (s CounterSample) Type() int {
+	return TypeCounterSample
 }
 
 func decodeEthernetRecord(f io.Reader) EthIfaceCounters {

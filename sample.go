@@ -1,4 +1,4 @@
-package main
+package sflow
 
 import (
 	"encoding/binary"
@@ -6,8 +6,7 @@ import (
 )
 
 type Sample interface {
-	Sequence() uint32
-	Records() []Record
+	Type() int
 }
 
 type Record interface {
