@@ -43,6 +43,16 @@ func decodeDatagramHeader(f *bytes.Reader) DatagramHeader {
 	return header
 }
 
+// Decode decodes an sFlow datagram in the form of a []byte.
+// A Datagram has a header and a slice of samples.
+// Sample is an interface type, since there are different
+// types of sFlow samples. You'll have to call sample.SampleType()
+// to be able to make the right type assertion.
+//
+// Samples have a similar format. Each sample has a header and
+// a slice of records. Since there are different types of records,
+// Record is an interface type. You'll have to call
+// record.RecordType() to make the right type assertion.
 func Decode(packet []byte) Datagram {
 	packetReader := bytes.NewReader(packet)
 
