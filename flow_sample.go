@@ -1,4 +1,4 @@
-package main
+package sflow
 
 import (
 	"encoding/binary"
@@ -35,10 +35,13 @@ type FlowRecordHeader struct {
 	DataLength uint32
 }
 
-type FlowSampleHeaderInterface interface{}
-
 type FlowSample struct {
-	header  FlowSampleHeaderInterface
+	header  FlowSampleHeader
+	records []Record
+}
+
+type FlowExpandedSample struct {
+	header  FlowExpandedSampleHeader
 	records []Record
 }
 
@@ -52,12 +55,12 @@ func (f FlowSample) String() string {
 	return out
 }
 
-func (f FlowSample) Records() []Record {
-	return f.records
+func (f FlowSample) Type() int {
+	return TypeFlowSample
 }
 
-func (f FlowSample) Sequence() uint32 {
-	return 0
+func (f FlowExpandedSample) Type() int {
+	return TypeExpandedFlowSample
 }
 
 const (
@@ -126,7 +129,7 @@ func DecodeExpandedFlowSample(f io.ReadSeeker) Sample {
 	header := FlowExpandedSampleHeader{}
 	binary.Read(f, binary.BigEndian, &header)
 
-	sample := FlowSample{}
+	sample := FlowExpandedSample{}
 	sample.header = header
 
 	for i := uint32(0); i < header.FlowRecords; i++ {
