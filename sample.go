@@ -26,13 +26,13 @@ type SampleDataHeader struct {
 	SampleLength uint32
 }
 
-func DecodeSampleDataHeader(f io.Reader) SampleDataHeader {
+func DecodeSampleDataHeader(f io.ReadSeeker) SampleDataHeader {
 	sDH := SampleDataHeader{}
 	binary.Read(f, binary.BigEndian, &sDH)
 	return sDH
 }
 
-func DecodeSample(f io.Reader) Sample {
+func DecodeSample(f io.ReadSeeker) Sample {
 	header := DecodeSampleDataHeader(f)
 
 	switch header.DataFormat {
@@ -42,7 +42,8 @@ func DecodeSample(f io.Reader) Sample {
 		return DecodeFlowSample(f)
 	case TypeExpandedFlowSample:
 		return DecodeExpandedFlowSample(f)
-	default:
+	default: // unknown sample type
+		f.Seek(int64(header.SampleLength), 1)
 		return nil
 	}
 
