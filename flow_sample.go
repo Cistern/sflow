@@ -112,6 +112,8 @@ func decodeFlowSample(f io.ReadSeeker) Sample {
 		switch fRH.DataFormat {
 		case TypeIpv4Flow:
 			sample.Records = append(sample.Records, decodeIpv4FlowRecord(f))
+		case TypeIpv6Flow:
+			sample.Records = append(sample.Records, decodeIpv6FlowRecord(f))
 		case TypeRawPacketFlow:
 			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(f))
 		case TypeExtendedSwitchFlow:
