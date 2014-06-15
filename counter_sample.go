@@ -25,6 +25,10 @@ const (
 	TypeVgCounter           = 4
 	TypeVlanCounter         = 5
 	TypeProcessorCounter    = 1001
+	TypeHostCpuCounter      = 2003
+	TypeHostMemoryCounter   = 2004
+	TypeHostDiskCounter     = 2005
+	TypeHostNetCounter      = 2006
 )
 
 type CounterSample struct {
@@ -46,7 +50,7 @@ func (s CounterSample) SampleType() int {
 	return TypeCounterSample
 }
 
-func decodeCounterSample(f io.Reader) Sample {
+func decodeCounterSample(f io.ReadSeeker) Sample {
 	header := CounterSampleHeader{}
 	binary.Read(f, binary.BigEndian, &header)
 
@@ -70,6 +74,16 @@ func decodeCounterSample(f io.Reader) Sample {
 			sample.Records = append(sample.Records, decodeVlanRecord(f))
 		case TypeProcessorCounter:
 			sample.Records = append(sample.Records, decodeProcessorRecord(f))
+		case TypeHostCpuCounter:
+			sample.Records = append(sample.Records, decodeHostCpuRecord(f))
+		case TypeHostMemoryCounter:
+			sample.Records = append(sample.Records, decodeHostMemoryRecord(f))
+		case TypeHostDiskCounter:
+			sample.Records = append(sample.Records, decodeHostDiskRecord(f))
+		case TypeHostNetCounter:
+			sample.Records = append(sample.Records, decodeHostNetRecord(f))
+		default:
+			f.Seek(int64(cRH.DataLength), 1)
 		}
 	}
 

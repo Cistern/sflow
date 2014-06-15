@@ -98,6 +98,66 @@ type ProcessorInfo struct {
 	FreeMem  uint64
 }
 
+type HostCpuCounters struct {
+	Load1m       float32
+	Load5m       float32
+	Load15m      float32
+	ProcsRunning uint32
+	ProcsTotal   uint32
+	NumCPU       uint32
+	SpeedCPU     uint32
+	Uptime       uint32
+
+	CpuUser         uint32
+	CpuNice         uint32
+	CpuSys          uint32
+	CpuIdle         uint32
+	CpuWio          uint32
+	CpuIntr         uint32
+	CpuSoftIntr     uint32
+	Interrupts      uint32
+	ContextSwitches uint32
+}
+
+type HostMemoryCounters struct {
+	Total     uint64
+	Free      uint64
+	Shared    uint64
+	Buffers   uint64
+	Cached    uint64
+	SwapTotal uint64
+	SwapFree  uint64
+
+	PageIn  uint32
+	PageOut uint32
+	SwapIn  uint32
+	SwapOut uint32
+}
+
+type HostDiskCounters struct {
+	Total          uint64
+	Free           uint64
+	MaxUsedPercent float32
+	Reads          uint32
+	BytesRead      uint64
+	ReadTime       uint32
+	Writes         uint32
+	BytesWritten   uint64
+	WriteTime      uint32
+}
+
+type HostNetCounters struct {
+	BytesIn   uint64
+	PacketsIn uint32
+	ErrsIn    uint32
+	DropsIn   uint32
+
+	BytesOut   uint64
+	PacketsOut uint32
+	ErrsOut    uint32
+	DropsOut   uint32
+}
+
 func (r EthIfaceCounters) RecordType() int {
 	return TypeEthernetCounter
 }
@@ -120,6 +180,22 @@ func (r VlanCounters) RecordType() int {
 
 func (r ProcessorInfo) RecordType() int {
 	return TypeProcessorCounter
+}
+
+func (r HostCpuCounters) RecordType() int {
+	return TypeHostCpuCounter
+}
+
+func (r HostMemoryCounters) RecordType() int {
+	return TypeHostMemoryCounter
+}
+
+func (r HostDiskCounters) RecordType() int {
+	return TypeHostDiskCounter
+}
+
+func (r HostNetCounters) RecordType() int {
+	return TypeHostNetCounter
 }
 
 func decodeEthernetRecord(f io.Reader) EthIfaceCounters {
@@ -154,6 +230,30 @@ func decodeVlanRecord(f io.Reader) VlanCounters {
 
 func decodeProcessorRecord(f io.Reader) ProcessorInfo {
 	e := ProcessorInfo{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeHostCpuRecord(f io.Reader) HostCpuCounters {
+	e := HostCpuCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeHostMemoryRecord(f io.Reader) HostMemoryCounters {
+	e := HostMemoryCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeHostDiskRecord(f io.Reader) HostDiskCounters {
+	e := HostDiskCounters{}
+	binary.Read(f, binary.BigEndian, &e)
+	return e
+}
+
+func decodeHostNetRecord(f io.Reader) HostNetCounters {
+	e := HostNetCounters{}
 	binary.Read(f, binary.BigEndian, &e)
 	return e
 }
