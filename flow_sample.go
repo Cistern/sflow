@@ -124,12 +124,14 @@ func decodeFlowSample(r io.ReadSeeker) Sample {
 		fRH := FlowRecordHeader{}
 		binary.Read(r, binary.BigEndian, &fRH)
 		switch fRH.DataFormat {
+		case TypeRawPacketFlow:
+			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r))
+		case TypeEthernetFrameFlow:
+			sample.Records = append(sample.Records, decodeEthernetFrameFlowRecord(r))
 		case TypeIpv4Flow:
 			sample.Records = append(sample.Records, decodeIpv4FlowRecord(r))
 		case TypeIpv6Flow:
 			sample.Records = append(sample.Records, decodeIpv6FlowRecord(r))
-		case TypeRawPacketFlow:
-			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r))
 		case TypeExtendedSwitchFlow:
 			sample.Records = append(sample.Records, decodeExtendedSwitchFlowRecord(r))
 		default:
@@ -153,10 +155,14 @@ func decodeExpandedFlowSample(r io.ReadSeeker) Sample {
 		binary.Read(r, binary.BigEndian, &fRH)
 
 		switch fRH.DataFormat {
-		case TypeIpv4Flow:
-			sample.Records = append(sample.Records, decodeIpv4FlowRecord(r))
 		case TypeRawPacketFlow:
 			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r))
+		case TypeEthernetFrameFlow:
+			sample.Records = append(sample.Records, decodeEthernetFrameFlowRecord(r))
+		case TypeIpv4Flow:
+			sample.Records = append(sample.Records, decodeIpv4FlowRecord(r))
+		case TypeIpv6Flow:
+			sample.Records = append(sample.Records, decodeIpv6FlowRecord(r))
 		case TypeExtendedSwitchFlow:
 			sample.Records = append(sample.Records, decodeExtendedSwitchFlowRecord(r))
 		default:

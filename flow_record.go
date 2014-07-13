@@ -6,6 +6,21 @@ import (
 	"net"
 )
 
+type RawPacketFlowRecord struct {
+	Protocol    uint32
+	FrameLength uint32
+	Stripped    uint32
+	HeaderSize  uint32
+	Header      []byte
+}
+
+type EthernetFrameFlowRecord struct {
+	Length    uint32
+	SourceMac net.HardwareAddr
+	DestMac   net.HardwareAddr
+	Type      uint32
+}
+
 type Ipv4FlowRecord struct {
 	Length     uint32
 	Protocol   uint32
@@ -28,19 +43,19 @@ type Ipv6FlowRecord struct {
 	Priority   uint32
 }
 
-type RawPacketFlowRecord struct {
-	Protocol    uint32
-	FrameLength uint32
-	Stripped    uint32
-	HeaderSize  uint32
-	Header      []byte
-}
-
 type ExtendedSwitchFlowRecord struct {
 	SourceVlan          uint32
 	SourcePriority      uint32
 	DestinationVlan     uint32
 	DestinationPriority uint32
+}
+
+func (f RawPacketFlowRecord) RecordType() int {
+	return TypeRawPacketFlow
+}
+
+func (f EthernetFrameFlowRecord) RecordType() int {
+	return TypeEthernetFrameFlow
 }
 
 func (f Ipv4FlowRecord) RecordType() int {
@@ -51,12 +66,31 @@ func (f Ipv6FlowRecord) RecordType() int {
 	return TypeIpv6Flow
 }
 
-func (f RawPacketFlowRecord) RecordType() int {
-	return TypeRawPacketFlow
-}
-
 func (f ExtendedSwitchFlowRecord) RecordType() int {
 	return TypeExtendedSwitchFlow
+}
+
+func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
+	f := RawPacketFlowRecord{}
+	binary.Read(r, binary.BigEndian, &f.Protocol)
+	binary.Read(r, binary.BigEndian, &f.FrameLength)
+	binary.Read(r, binary.BigEndian, &f.Stripped)
+	binary.Read(r, binary.BigEndian, &f.HeaderSize)
+	f.Header = make([]byte, f.HeaderSize)
+	io.ReadFull(r, f.Header)
+	return f
+}
+
+func decodeEthernetFrameFlowRecord(r io.Reader) EthernetFrameFlowRecord {
+	f := EthernetFrameFlowRecord{}
+	binary.Read(r, binary.BigEndian, f.Length)
+	var src, dst [6]byte
+	r.Read(src[:])
+	f.SourceMac = net.HardwareAddr(src[:])
+	r.Read(dst[:])
+	f.DestMac = net.HardwareAddr(dst[:])
+	binary.Read(r, binary.BigEndian, f.Type)
+	return f
 }
 
 func decodeIpv4FlowRecord(r io.Reader) Ipv4FlowRecord {
@@ -93,17 +127,6 @@ func decodeIpv6FlowRecord(r io.Reader) Ipv6FlowRecord {
 	binary.Read(r, binary.BigEndian, &f.Flags)
 	binary.Read(r, binary.BigEndian, &f.Priority)
 
-	return f
-}
-
-func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
-	f := RawPacketFlowRecord{}
-	binary.Read(r, binary.BigEndian, &f.Protocol)
-	binary.Read(r, binary.BigEndian, &f.FrameLength)
-	binary.Read(r, binary.BigEndian, &f.Stripped)
-	binary.Read(r, binary.BigEndian, &f.HeaderSize)
-	f.Header = make([]byte, f.HeaderSize)
-	io.ReadFull(r, f.Header)
 	return f
 }
 
