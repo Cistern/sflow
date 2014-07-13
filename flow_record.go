@@ -3,13 +3,14 @@ package sflow
 import (
 	"encoding/binary"
 	"io"
+	"net"
 )
 
 type Ipv4FlowRecord struct {
 	Length     uint32
 	Protocol   uint32
-	SourceIp   [4]byte
-	DestIp     [4]byte
+	SourceIp   net.IP
+	DestIp     net.IP
 	SourcePort uint32
 	DestPort   uint32
 	Flags      uint32
@@ -17,14 +18,14 @@ type Ipv4FlowRecord struct {
 }
 
 type Ipv6FlowRecord struct {
-	Length    uint32
-	Protocol  uint32
-	SourceIp  [16]byte
-	DestIp    [16]byte
-	SourtPort uint32
-	DestPort  uint32
-	Flags     uint32
-	Priority  uint32
+	Length     uint32
+	Protocol   uint32
+	SourceIp   net.IP
+	DestIp     net.IP
+	SourcePort uint32
+	DestPort   uint32
+	Flags      uint32
+	Priority   uint32
 }
 
 type RawPacketFlowRecord struct {
@@ -60,13 +61,38 @@ func (r ExtendedSwitchFlowRecord) RecordType() int {
 
 func decodeIpv4FlowRecord(f io.Reader) Ipv4FlowRecord {
 	r := Ipv4FlowRecord{}
-	binary.Read(f, binary.BigEndian, &r)
+	binary.Read(f, binary.BigEndian, &r.Length)
+	binary.Read(f, binary.BigEndian, &r.Protocol)
+	var ip [4]byte
+	f.Read(ip[:])
+	r.SourceIp = net.IPv4(ip[0], ip[1], ip[2], ip[3])
+	f.Read(ip[:])
+	r.DestIp = net.IPv4(ip[0], ip[1], ip[2], ip[3])
+
+	binary.Read(f, binary.BigEndian, &r.SourcePort)
+	binary.Read(f, binary.BigEndian, &r.DestPort)
+	binary.Read(f, binary.BigEndian, &r.Flags)
+	binary.Read(f, binary.BigEndian, &r.Tos)
+
 	return r
 }
 
 func decodeIpv6FlowRecord(f io.Reader) Ipv6FlowRecord {
 	r := Ipv6FlowRecord{}
-	binary.Read(f, binary.BigEndian, &r)
+
+	binary.Read(f, binary.BigEndian, &r.Length)
+	binary.Read(f, binary.BigEndian, &r.Protocol)
+	var src, dst [16]byte
+	f.Read(src[:])
+	r.SourceIp = net.IP(src[:])
+	f.Read(dst[:])
+	r.DestIp = net.IP(dst[:])
+
+	binary.Read(f, binary.BigEndian, &r.SourcePort)
+	binary.Read(f, binary.BigEndian, &r.DestPort)
+	binary.Read(f, binary.BigEndian, &r.Flags)
+	binary.Read(f, binary.BigEndian, &r.Priority)
+
 	return r
 }
 
