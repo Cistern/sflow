@@ -158,102 +158,102 @@ type HostNetCounters struct {
 	DropsOut   uint32
 }
 
-func (r EthIfaceCounters) RecordType() int {
+func (c EthIfaceCounters) RecordType() int {
 	return TypeEthernetCounter
 }
 
-func (r GenericIfaceCounters) RecordType() int {
+func (c GenericIfaceCounters) RecordType() int {
 	return TypeGenericIfaceCounter
 }
 
-func (r VgCounters) RecordType() int {
+func (c VgCounters) RecordType() int {
 	return TypeVgCounter
 }
 
-func (r TokenRingCounters) RecordType() int {
+func (c TokenRingCounters) RecordType() int {
 	return TypeTokenRingCounter
 }
 
-func (r VlanCounters) RecordType() int {
+func (c VlanCounters) RecordType() int {
 	return TypeVlanCounter
 }
 
-func (r ProcessorInfo) RecordType() int {
+func (c ProcessorInfo) RecordType() int {
 	return TypeProcessorCounter
 }
 
-func (r HostCpuCounters) RecordType() int {
+func (c HostCpuCounters) RecordType() int {
 	return TypeHostCpuCounter
 }
 
-func (r HostMemoryCounters) RecordType() int {
+func (c HostMemoryCounters) RecordType() int {
 	return TypeHostMemoryCounter
 }
 
-func (r HostDiskCounters) RecordType() int {
+func (c HostDiskCounters) RecordType() int {
 	return TypeHostDiskCounter
 }
 
-func (r HostNetCounters) RecordType() int {
+func (c HostNetCounters) RecordType() int {
 	return TypeHostNetCounter
 }
 
-func decodeEthernetRecord(f io.Reader) EthIfaceCounters {
-	e := EthIfaceCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeEthernetRecord(r io.Reader) EthIfaceCounters {
+	c := EthIfaceCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeGenericIfaceRecord(f io.Reader) GenericIfaceCounters {
-	e := GenericIfaceCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeGenericIfaceRecord(r io.Reader) GenericIfaceCounters {
+	c := GenericIfaceCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeVgRecord(f io.Reader) VgCounters {
-	e := VgCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeVgRecord(r io.Reader) VgCounters {
+	c := VgCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeTokenRingRecord(f io.Reader) TokenRingCounters {
-	e := TokenRingCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeTokenRingRecord(r io.Reader) TokenRingCounters {
+	c := TokenRingCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeVlanRecord(f io.Reader) VlanCounters {
-	e := VlanCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeVlanRecord(r io.Reader) VlanCounters {
+	c := VlanCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeProcessorRecord(f io.Reader) ProcessorInfo {
-	e := ProcessorInfo{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeProcessorRecord(r io.Reader) ProcessorInfo {
+	c := ProcessorInfo{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeHostCpuRecord(f io.Reader) HostCpuCounters {
-	e := HostCpuCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeHostCpuRecord(r io.Reader) HostCpuCounters {
+	c := HostCpuCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeHostMemoryRecord(f io.Reader) HostMemoryCounters {
-	e := HostMemoryCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeHostMemoryRecord(r io.Reader) HostMemoryCounters {
+	c := HostMemoryCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeHostDiskRecord(f io.Reader) HostDiskCounters {
-	e := HostDiskCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeHostDiskRecord(r io.Reader) HostDiskCounters {
+	c := HostDiskCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }
 
-func decodeHostNetRecord(f io.Reader) HostNetCounters {
-	e := HostNetCounters{}
-	binary.Read(f, binary.BigEndian, &e)
-	return e
+func decodeHostNetRecord(r io.Reader) HostNetCounters {
+	c := HostNetCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
 }

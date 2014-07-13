@@ -50,48 +50,48 @@ func (s CounterSample) SampleType() int {
 	return TypeCounterSample
 }
 
-func decodeCounterSample(f io.ReadSeeker) Sample {
+func decodeCounterSample(r io.ReadSeeker) Sample {
 	header := CounterSampleHeader{}
 
-	binary.Read(f, binary.BigEndian, &header.SequenceNum)
-	binary.Read(f, binary.BigEndian, &header.SourceIdType)
+	binary.Read(r, binary.BigEndian, &header.SequenceNum)
+	binary.Read(r, binary.BigEndian, &header.SourceIdType)
 	var srcIdType [3]byte
-	f.Read(srcIdType[:])
+	r.Read(srcIdType[:])
 	header.SourceIdIndexVal = uint32(srcIdType[2]) | uint32(srcIdType[1]<<8) |
 		uint32(srcIdType[0]<<16)
 
-	binary.Read(f, binary.BigEndian, &header.CounterRecords)
+	binary.Read(r, binary.BigEndian, &header.CounterRecords)
 
 	sample := CounterSample{}
 	sample.Header = header
 
 	for i := uint32(0); i < header.CounterRecords; i++ {
 		cRH := CounterRecordHeader{}
-		binary.Read(f, binary.BigEndian, &cRH)
+		binary.Read(r, binary.BigEndian, &cRH)
 
 		switch cRH.DataFormat {
 		case TypeEthernetCounter:
-			sample.Records = append(sample.Records, decodeEthernetRecord(f))
+			sample.Records = append(sample.Records, decodeEthernetRecord(r))
 		case TypeGenericIfaceCounter:
-			sample.Records = append(sample.Records, decodeGenericIfaceRecord(f))
+			sample.Records = append(sample.Records, decodeGenericIfaceRecord(r))
 		case TypeTokenRingCounter:
-			sample.Records = append(sample.Records, decodeTokenRingRecord(f))
+			sample.Records = append(sample.Records, decodeTokenRingRecord(r))
 		case TypeVgCounter:
-			sample.Records = append(sample.Records, decodeVgRecord(f))
+			sample.Records = append(sample.Records, decodeVgRecord(r))
 		case TypeVlanCounter:
-			sample.Records = append(sample.Records, decodeVlanRecord(f))
+			sample.Records = append(sample.Records, decodeVlanRecord(r))
 		case TypeProcessorCounter:
-			sample.Records = append(sample.Records, decodeProcessorRecord(f))
+			sample.Records = append(sample.Records, decodeProcessorRecord(r))
 		case TypeHostCpuCounter:
-			sample.Records = append(sample.Records, decodeHostCpuRecord(f))
+			sample.Records = append(sample.Records, decodeHostCpuRecord(r))
 		case TypeHostMemoryCounter:
-			sample.Records = append(sample.Records, decodeHostMemoryRecord(f))
+			sample.Records = append(sample.Records, decodeHostMemoryRecord(r))
 		case TypeHostDiskCounter:
-			sample.Records = append(sample.Records, decodeHostDiskRecord(f))
+			sample.Records = append(sample.Records, decodeHostDiskRecord(r))
 		case TypeHostNetCounter:
-			sample.Records = append(sample.Records, decodeHostNetRecord(f))
+			sample.Records = append(sample.Records, decodeHostNetRecord(r))
 		default:
-			f.Seek(int64(cRH.DataLength), 1)
+			r.Seek(int64(cRH.DataLength), 1)
 		}
 	}
 
