@@ -9,7 +9,7 @@ import (
 type CounterSampleHeader struct {
 	SequenceNum      uint32
 	SourceIdType     byte
-	SourceIdIndexVal [3]byte
+	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
 	CounterRecords   uint32
 }
 
@@ -52,7 +52,15 @@ func (s CounterSample) SampleType() int {
 
 func decodeCounterSample(f io.ReadSeeker) Sample {
 	header := CounterSampleHeader{}
-	binary.Read(f, binary.BigEndian, &header)
+
+	binary.Read(f, binary.BigEndian, &header.SequenceNum)
+	binary.Read(f, binary.BigEndian, &header.SourceIdType)
+	var srcIdType [3]byte
+	f.Read(srcIdType[:])
+	header.SourceIdIndexVal = uint32(srcIdType[2]) | uint32(srcIdType[1]<<8) |
+		uint32(srcIdType[0]<<16)
+
+	binary.Read(f, binary.BigEndian, &header.CounterRecords)
 
 	sample := CounterSample{}
 	sample.Header = header

@@ -9,7 +9,7 @@ import (
 type FlowSampleHeader struct {
 	SequenceNum      uint32
 	SourceIdType     byte
-	SourceIdIndexVal [3]byte
+	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
 	SamplingRate     uint32
 	SamplePool       uint32
 	Drops            uint32
@@ -101,7 +101,21 @@ const (
 
 func decodeFlowSample(f io.ReadSeeker) Sample {
 	header := FlowSampleHeader{}
-	binary.Read(f, binary.BigEndian, &header)
+
+	binary.Read(f, binary.BigEndian, &header.SequenceNum)
+	binary.Read(f, binary.BigEndian, &header.SourceIdType)
+
+	var srcIdType [3]byte
+	f.Read(srcIdType[:])
+	header.SourceIdIndexVal = uint32(srcIdType[2]) | uint32(srcIdType[1]<<8) |
+		uint32(srcIdType[0]<<16)
+
+	binary.Read(f, binary.BigEndian, &header.SamplingRate)
+	binary.Read(f, binary.BigEndian, &header.SamplePool)
+	binary.Read(f, binary.BigEndian, &header.Drops)
+	binary.Read(f, binary.BigEndian, &header.Input)
+	binary.Read(f, binary.BigEndian, &header.Output)
+	binary.Read(f, binary.BigEndian, &header.FlowRecords)
 
 	sample := FlowSample{}
 	sample.Header = header
