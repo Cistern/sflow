@@ -3,6 +3,7 @@ package sflow
 import (
 	"bytes"
 	"encoding/binary"
+	"io"
 	"net"
 )
 
@@ -21,24 +22,24 @@ type DatagramHeader struct {
 	NumSamples   uint32
 }
 
-func decodeDatagramHeader(f *bytes.Reader) DatagramHeader {
+func decodeDatagramHeader(r io.Reader) DatagramHeader {
 	header := DatagramHeader{}
 
-	binary.Read(f, binary.BigEndian, &header.SflowVersion)
-	binary.Read(f, binary.BigEndian, &header.IpVersion)
+	binary.Read(r, binary.BigEndian, &header.SflowVersion)
+	binary.Read(r, binary.BigEndian, &header.IpVersion)
 	ipLen := 4
 	if header.IpVersion == 2 {
 		ipLen = 16
 	}
 
 	ipBuf := make([]byte, ipLen)
-	f.Read(ipBuf)
+	r.Read(ipBuf)
 	header.IpAddress = ipBuf
 
-	binary.Read(f, binary.BigEndian, &header.SubAgentId)
-	binary.Read(f, binary.BigEndian, &header.SequenceNum)
-	binary.Read(f, binary.BigEndian, &header.SwitchUptime)
-	binary.Read(f, binary.BigEndian, &header.NumSamples)
+	binary.Read(r, binary.BigEndian, &header.SubAgentId)
+	binary.Read(r, binary.BigEndian, &header.SequenceNum)
+	binary.Read(r, binary.BigEndian, &header.SwitchUptime)
+	binary.Read(r, binary.BigEndian, &header.NumSamples)
 
 	return header
 }
