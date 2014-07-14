@@ -89,7 +89,7 @@ func TestHost(t *testing.T) {
 
 }
 
-func TestEncode(t *testing.T) {
+func TestHostCountersEncode(t *testing.T) {
 	packet, _ := ioutil.ReadFile("./_test/host_sample.dump")
 	d := Decode(packet)
 	records := []Record{}
@@ -128,5 +128,40 @@ func TestEncode(t *testing.T) {
 
 	if cs.Records[3].(HostNetCounters).PacketsIn != 72 {
 		t.Fatal("Host net counters had incorrect data")
+	}
+}
+
+func TestSwitchCountersEncode(t *testing.T) {
+	packet, _ := ioutil.ReadFile("./_test/counter_sample.dump")
+	d := Decode(packet)
+	records := []Record{}
+	for _, sample := range d.Samples {
+		records = append(records, sample.GetRecords()...)
+	}
+
+	encoded := Encode(d.Header.IpAddress, d.Header.SubAgentId, d.Header.SwitchUptime,
+		d.Header.SequenceNum, 1, 1, 1, records)
+
+	d = Decode(encoded)
+
+	if d.Header.SflowVersion != 5 {
+		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
+	}
+	if len(d.Samples) != 1 {
+		t.Fatalf("Expected %v sample(s), got %v", 1, len(d.Samples))
+	}
+
+	cs := d.Samples[0].(CounterSample)
+	if cs.SampleType() != TypeCounterSample {
+		t.Fatalf("Expected a counter sample but didn't get one")
+	}
+
+	for _, record := range cs.Records {
+		if record.RecordType() == TypeGenericIfaceCounter {
+			i := record.(GenericIfaceCounters)
+			if i.Speed != 100000000 {
+				t.Errorf("Expected interface speed to be %v, got %v", 100000000, i.Speed)
+			}
+		}
 	}
 }
