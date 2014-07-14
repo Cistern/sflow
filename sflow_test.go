@@ -88,3 +88,45 @@ func TestHost(t *testing.T) {
 	}
 
 }
+
+func TestEncode(t *testing.T) {
+	packet, _ := ioutil.ReadFile("./_test/host_sample.dump")
+	d := Decode(packet)
+	records := []Record{}
+	for _, sample := range d.Samples {
+		records = append(records, sample.GetRecords()...)
+	}
+
+	encoded := Encode(d.Header.IpAddress, d.Header.SubAgentId, d.Header.SwitchUptime,
+		d.Header.SequenceNum, 1, 1, 1, records)
+
+	d = Decode(encoded)
+
+	if d.Header.SflowVersion != 5 {
+		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
+	}
+	if len(d.Samples) != 1 {
+		t.Fatalf("Expected %v sample(s), got %v", 1, len(d.Samples))
+	}
+
+	cs := d.Samples[0].(CounterSample)
+	if cs.SampleType() != TypeCounterSample {
+		t.Fatalf("Expected a counter sample but didn't get one")
+	}
+
+	if cs.Records[0].(HostDiskCounters).BytesWritten != 23503597568 {
+		t.Fatal("Host disk counters had incorrect data")
+	}
+
+	if cs.Records[1].(HostMemoryCounters).Free != 575180800 {
+		t.Fatal("Host memory counters had incorrect data")
+	}
+
+	if cs.Records[2].(HostCpuCounters).Load5m != 0.580 {
+		t.Fatal("Host CPU counters had incorrect data")
+	}
+
+	if cs.Records[3].(HostNetCounters).PacketsIn != 72 {
+		t.Fatal("Host net counters had incorrect data")
+	}
+}

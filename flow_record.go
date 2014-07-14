@@ -81,6 +81,10 @@ func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
 	return f
 }
 
+func (f RawPacketFlowRecord) Encode(w io.Writer) {
+	// TODO
+}
+
 func decodeEthernetFrameFlowRecord(r io.Reader) EthernetFrameFlowRecord {
 	f := EthernetFrameFlowRecord{}
 	binary.Read(r, binary.BigEndian, f.Length)
@@ -91,6 +95,10 @@ func decodeEthernetFrameFlowRecord(r io.Reader) EthernetFrameFlowRecord {
 	f.DestMac = net.HardwareAddr(dst[:])
 	binary.Read(r, binary.BigEndian, f.Type)
 	return f
+}
+
+func (f EthernetFrameFlowRecord) Encode(w io.Writer) {
+	// TODO
 }
 
 func decodeIpv4FlowRecord(r io.Reader) Ipv4FlowRecord {
@@ -109,6 +117,10 @@ func decodeIpv4FlowRecord(r io.Reader) Ipv4FlowRecord {
 	binary.Read(r, binary.BigEndian, &f.Tos)
 
 	return f
+}
+
+func (f Ipv4FlowRecord) Encode(w io.Writer) {
+	// TODO
 }
 
 func decodeIpv6FlowRecord(r io.Reader) Ipv6FlowRecord {
@@ -130,8 +142,16 @@ func decodeIpv6FlowRecord(r io.Reader) Ipv6FlowRecord {
 	return f
 }
 
+func (f Ipv6FlowRecord) Encode(w io.Writer) {
+	// TODO
+}
+
 func decodeExtendedSwitchFlowRecord(r io.Reader) ExtendedSwitchFlowRecord {
 	f := ExtendedSwitchFlowRecord{}
 	binary.Read(r, binary.BigEndian, &f)
 	return f
+}
+
+func (f ExtendedSwitchFlowRecord) Encode(w io.Writer) {
+	// TODO
 }

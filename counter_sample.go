@@ -50,6 +50,10 @@ func (s CounterSample) SampleType() int {
 	return TypeCounterSample
 }
 
+func (s CounterSample) GetRecords() []Record {
+	return s.Records
+}
+
 func decodeCounterSample(r io.ReadSeeker) Sample {
 	header := CounterSampleHeader{}
 
