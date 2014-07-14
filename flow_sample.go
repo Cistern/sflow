@@ -59,8 +59,16 @@ func (f FlowSample) SampleType() int {
 	return TypeFlowSample
 }
 
+func (f FlowSample) GetRecords() []Record {
+	return f.Records
+}
+
 func (f FlowExpandedSample) SampleType() int {
 	return TypeExpandedFlowSample
+}
+
+func (f FlowExpandedSample) GetRecords() []Record {
+	return f.Records
 }
 
 const (

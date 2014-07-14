@@ -7,10 +7,12 @@ import (
 
 type Sample interface {
 	SampleType() int
+	GetRecords() []Record
 }
 
 type Record interface {
 	RecordType() int
+	Encode(io.Writer)
 }
 
 // Sample types
