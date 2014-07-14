@@ -3,7 +3,6 @@ package sflow
 import (
 	"encoding/binary"
 	"io"
-	"unsafe"
 )
 
 type GenericIfaceCounters struct {
@@ -208,7 +207,7 @@ func decodeEthernetRecord(r io.Reader) EthIfaceCounters {
 func (c EthIfaceCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 52,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -224,7 +223,7 @@ func decodeGenericIfaceRecord(r io.Reader) GenericIfaceCounters {
 func (c GenericIfaceCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 88,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -240,7 +239,7 @@ func decodeVgRecord(r io.Reader) VgCounters {
 func (c VgCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 80,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -256,7 +255,7 @@ func decodeTokenRingRecord(r io.Reader) TokenRingCounters {
 func (c TokenRingCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 72,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -272,7 +271,7 @@ func decodeVlanRecord(r io.Reader) VlanCounters {
 func (c VlanCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 28,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -288,7 +287,7 @@ func decodeProcessorRecord(r io.Reader) ProcessorInfo {
 func (c ProcessorInfo) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 28,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -304,7 +303,7 @@ func decodeHostCpuRecord(r io.Reader) HostCpuCounters {
 func (c HostCpuCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 68,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -320,7 +319,7 @@ func decodeHostMemoryRecord(r io.Reader) HostMemoryCounters {
 func (c HostMemoryCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 72,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -336,7 +335,7 @@ func decodeHostDiskRecord(r io.Reader) HostDiskCounters {
 func (c HostDiskCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 52,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
@@ -352,7 +351,7 @@ func decodeHostNetRecord(r io.Reader) HostNetCounters {
 func (c HostNetCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
-		DataLength: uint32(unsafe.Sizeof(c)),
+		DataLength: 40,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
