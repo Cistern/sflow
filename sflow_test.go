@@ -2,6 +2,7 @@ package sflow
 
 import (
 	"io/ioutil"
+	"net"
 	"testing"
 )
 
@@ -161,6 +162,46 @@ func TestSwitchCountersEncode(t *testing.T) {
 			i := record.(GenericIfaceCounters)
 			if i.Speed != 100000000 {
 				t.Errorf("Expected interface speed to be %v, got %v", 100000000, i.Speed)
+			}
+		}
+	}
+}
+
+func TestApplicationCounters(t *testing.T) {
+	records := []Record{}
+
+	var applicationName [32]byte
+	copy(applicationName[:], "some_application_name")
+
+	records = append(records, ApplicationCounters{
+		ApplicationName: applicationName,
+		UserTime:        10,
+		SysTime:         20,
+		Vsize:           30,
+		Rss:             40,
+	})
+
+	encoded := Encode(net.IPv4(127, 0, 0, 1), 1, 1, 1, 1, 1, 1, records)
+
+	d := Decode(encoded)
+
+	if d.Header.SflowVersion != 5 {
+		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
+	}
+	if len(d.Samples) != 1 {
+		t.Fatalf("Expected %v sample(s), got %v", 1, len(d.Samples))
+	}
+
+	cs := d.Samples[0].(CounterSample)
+	if cs.SampleType() != TypeCounterSample {
+		t.Fatalf("Expected a counter sample but didn't get one")
+	}
+
+	for _, record := range cs.Records {
+		if record.RecordType() == TypeApplicationCounter {
+			a := record.(ApplicationCounters)
+			if a.SysTime != 20 {
+				t.Errorf("Expected sys time to be %v, got %v", 20, a.SysTime)
 			}
 		}
 	}

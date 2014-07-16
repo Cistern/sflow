@@ -34,7 +34,7 @@ func Encode(ip net.IP, subAgentId uint32, uptime uint32, sequenceNum uint32,
 			TypeTokenRingCounter, TypeVgCounter, TypeVlanCounter,
 			TypeProcessorCounter, TypeHostCpuCounter,
 			TypeHostMemoryCounter, TypeHostDiskCounter,
-			TypeHostNetCounter:
+			TypeHostNetCounter, TypeApplicationCounter:
 			counterRecords = append(counterRecords, record)
 		}
 	}
