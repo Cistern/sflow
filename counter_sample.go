@@ -29,6 +29,9 @@ const (
 	TypeHostMemoryCounter   = 2004
 	TypeHostDiskCounter     = 2005
 	TypeHostNetCounter      = 2006
+
+	// Custom (Enterprise) types
+	TypeApplicationCounter = (1)<<12 + 1
 )
 
 type CounterSample struct {
@@ -94,6 +97,8 @@ func decodeCounterSample(r io.ReadSeeker) Sample {
 			sample.Records = append(sample.Records, decodeHostDiskRecord(r))
 		case TypeHostNetCounter:
 			sample.Records = append(sample.Records, decodeHostNetRecord(r))
+		case TypeApplicationCounter:
+			sample.Records = append(sample.Records, decodeApplicationCounters(r))
 		default:
 			r.Seek(int64(cRH.DataLength), 1)
 		}

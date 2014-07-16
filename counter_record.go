@@ -158,6 +158,15 @@ type HostNetCounters struct {
 	DropsOut   uint32
 }
 
+type ApplicationCounters struct {
+	ApplicationName [32]byte
+
+	UserTime uint64
+	SysTime  uint64
+	Vsize    uint64
+	Rss      uint64
+}
+
 func (c EthIfaceCounters) RecordType() int {
 	return TypeEthernetCounter
 }
@@ -196,6 +205,10 @@ func (c HostDiskCounters) RecordType() int {
 
 func (c HostNetCounters) RecordType() int {
 	return TypeHostNetCounter
+}
+
+func (c ApplicationCounters) RecordType() int {
+	return TypeApplicationCounter
 }
 
 func decodeEthernetRecord(r io.Reader) EthIfaceCounters {
@@ -352,6 +365,22 @@ func (c HostNetCounters) Encode(w io.Writer) {
 	header := CounterRecordHeader{
 		DataFormat: uint32(c.RecordType()),
 		DataLength: 40,
+	}
+
+	binary.Write(w, binary.BigEndian, &header)
+	binary.Write(w, binary.BigEndian, &c)
+}
+
+func decodeApplicationCounters(r io.Reader) ApplicationCounters {
+	c := ApplicationCounters{}
+	binary.Read(r, binary.BigEndian, &c)
+	return c
+}
+
+func (c ApplicationCounters) Encode(w io.Writer) {
+	header := CounterRecordHeader{
+		DataFormat: uint32(c.RecordType()),
+		DataLength: 64,
 	}
 
 	binary.Write(w, binary.BigEndian, &header)
