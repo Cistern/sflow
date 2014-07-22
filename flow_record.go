@@ -70,13 +70,17 @@ func (f ExtendedSwitchFlowRecord) RecordType() int {
 	return TypeExtendedSwitchFlow
 }
 
-func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
+func decodeRawPacketFlowRecord(r io.Reader, dataLength uint32) RawPacketFlowRecord {
 	f := RawPacketFlowRecord{}
 	binary.Read(r, binary.BigEndian, &f.Protocol)
 	binary.Read(r, binary.BigEndian, &f.FrameLength)
 	binary.Read(r, binary.BigEndian, &f.Stripped)
 	binary.Read(r, binary.BigEndian, &f.HeaderSize)
-	f.Header = make([]byte, f.HeaderSize)
+
+	n := f.HeaderSize + 16
+	s := dataLength - n
+	f.Header = make([]byte, f.HeaderSize + s)
+
 	io.ReadFull(r, f.Header)
 	return f
 }
