@@ -133,7 +133,7 @@ func decodeFlowSample(r io.ReadSeeker) Sample {
 		binary.Read(r, binary.BigEndian, &fRH)
 		switch fRH.DataFormat {
 		case TypeRawPacketFlow:
-			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r))
+			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r, fRH.DataLength))
 		case TypeEthernetFrameFlow:
 			sample.Records = append(sample.Records, decodeEthernetFrameFlowRecord(r))
 		case TypeIpv4Flow:
@@ -164,7 +164,7 @@ func decodeExpandedFlowSample(r io.ReadSeeker) Sample {
 
 		switch fRH.DataFormat {
 		case TypeRawPacketFlow:
-			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r))
+			sample.Records = append(sample.Records, decodeRawPacketFlowRecord(r, fRH.DataLength))
 		case TypeEthernetFrameFlow:
 			sample.Records = append(sample.Records, decodeEthernetFrameFlowRecord(r))
 		case TypeIpv4Flow:
