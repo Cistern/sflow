@@ -77,13 +77,11 @@ func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
 	binary.Read(r, binary.BigEndian, &f.Stripped)
 	binary.Read(r, binary.BigEndian, &f.HeaderSize)
 
-	f.Header = make([]byte, f.HeaderSize)
-
-	if n := f.HeaderSize % 4; n != 0 {
-		r.Read(f.Header[:n])
-	}
-
+	f.Header = make([]byte, f.HeaderSize+(f.HeaderSize%4))
 	io.ReadFull(r, f.Header)
+
+	f.Header = f.Header[:f.HeaderSize]
+
 	return f
 }
 
