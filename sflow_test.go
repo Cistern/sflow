@@ -57,6 +57,62 @@ func TestFlow(t *testing.T) {
 	}
 }
 
+func TestFlow2(t *testing.T) {
+	packet, _ := ioutil.ReadFile("./_test/flow_samples_2.dump")
+	d := Decode(packet)
+	if d.Header.SflowVersion != 5 {
+		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
+	}
+	if len(d.Samples) != 2 {
+		t.Fatalf("Expected %v sample(s), got %v", 2, len(d.Samples))
+	}
+
+	cs := d.Samples[0].(FlowSample)
+	if cs.SampleType() != TypeFlowSample {
+		t.Fatalf("Expected a flow sample but didn't get one")
+	}
+
+	for _, record := range cs.Records {
+		if record.RecordType() == TypeExtendedSwitchFlow {
+			s := record.(ExtendedSwitchFlowRecord)
+			if !(s.DestinationVlan == s.SourceVlan && s.SourceVlan == 16) {
+				t.Errorf("Expected VLANs entries to be 16, got destination=%v, source=%v",
+					s.DestinationVlan, s.SourceVlan)
+			}
+		}
+	}
+
+	t.Log(d)
+}
+
+func TestFlow3(t *testing.T) {
+	packet, _ := ioutil.ReadFile("./_test/flow_sample_3.dump")
+	d := Decode(packet)
+	if d.Header.SflowVersion != 5 {
+		t.Errorf("Expected datagram sFlow version to be %v, got %v", 5, d.Header.SflowVersion)
+	}
+	if len(d.Samples) != 3 {
+		t.Fatalf("Expected %v sample(s), got %v", 3, len(d.Samples))
+	}
+
+	cs := d.Samples[0].(FlowSample)
+	if cs.SampleType() != TypeFlowSample {
+		t.Fatalf("Expected a flow sample but didn't get one")
+	}
+
+	for _, record := range cs.Records {
+		if record.RecordType() == TypeExtendedSwitchFlow {
+			s := record.(ExtendedSwitchFlowRecord)
+			if !(s.DestinationVlan == s.SourceVlan && s.SourceVlan == 16) {
+				t.Errorf("Expected VLANs entries to be 16, got destination=%v, source=%v",
+					s.DestinationVlan, s.SourceVlan)
+			}
+		}
+	}
+
+	t.Log(d)
+}
+
 func TestHost(t *testing.T) {
 	packet, _ := ioutil.ReadFile("./_test/host_sample.dump")
 	d := Decode(packet)
