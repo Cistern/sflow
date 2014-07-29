@@ -77,13 +77,7 @@ func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
 	binary.Read(r, binary.BigEndian, &f.Stripped)
 	binary.Read(r, binary.BigEndian, &f.HeaderSize)
 
-	// padding slice for struct alignment
-	pad := uint32(0)
-	if f.HeaderSize%4 > 0 {
-		pad = 4 - f.HeaderSize%4
-	}
-
-	f.Header = make([]byte, f.HeaderSize+pad)
+	f.Header = make([]byte, f.HeaderSize+((4-f.HeaderSize)%4))
 	io.ReadFull(r, f.Header)
 
 	// We need to consume the padded length,
