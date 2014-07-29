@@ -262,3 +262,19 @@ func TestApplicationCounters(t *testing.T) {
 		}
 	}
 }
+
+func BenchmarkFlow1Sample(b *testing.B) {
+	packet, _ := ioutil.ReadFile("./_test/flow_sample.dump")
+
+	for i := 0; i < b.N; i++ {
+		Decode(packet)
+	}
+}
+
+func BenchmarkFlow3Samples(b *testing.B) {
+	packet, _ := ioutil.ReadFile("./_test/flow_sample_3.dump")
+
+	for i := 0; i < b.N; i++ {
+		Decode(packet)
+	}
+}
