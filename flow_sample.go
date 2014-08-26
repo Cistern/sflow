@@ -173,6 +173,8 @@ func decodeExpandedFlowSample(r io.ReadSeeker) Sample {
 			sample.Records = append(sample.Records, decodeIpv6FlowRecord(r))
 		case TypeExtendedSwitchFlow:
 			sample.Records = append(sample.Records, decodeExtendedSwitchFlowRecord(r))
+		case TypeExtendedRouterFlow:
+			sample.Records = append(sample.Records, decodeExtendedRouterFlowRecord(r))
 		default:
 			r.Seek(int64(fRH.DataLength), 1)
 			continue

@@ -50,6 +50,12 @@ type ExtendedSwitchFlowRecord struct {
 	DestinationPriority uint32
 }
 
+type ExtendedRouterFlowRecord struct {
+	NextHop          net.IP
+	SourceMaskLength uint32
+	DestMaskLength   uint32
+}
+
 func (f RawPacketFlowRecord) RecordType() int {
 	return TypeRawPacketFlow
 }
@@ -68,6 +74,10 @@ func (f Ipv6FlowRecord) RecordType() int {
 
 func (f ExtendedSwitchFlowRecord) RecordType() int {
 	return TypeExtendedSwitchFlow
+}
+
+func (f ExtendedRouterFlowRecord) RecordType() int {
+	return TypeExtendedRouterFlow
 }
 
 func decodeRawPacketFlowRecord(r io.Reader) RawPacketFlowRecord {
@@ -159,5 +169,19 @@ func decodeExtendedSwitchFlowRecord(r io.Reader) ExtendedSwitchFlowRecord {
 }
 
 func (f ExtendedSwitchFlowRecord) Encode(w io.Writer) {
+	// TODO
+}
+
+func decodeExtendedRouterFlowRecord(r io.Reader) ExtendedRouterFlowRecord {
+	f := ExtendedRouterFlowRecord{}
+	var ipBuf [16]byte
+	r.Read(ipBuf[:])
+	f.NextHop = net.IP(ipBuf[:])
+	binary.Read(r, binary.BigEndian, &f.SourceMaskLength)
+	binary.Read(r, binary.BigEndian, &f.DestMaskLength)
+	return f
+}
+
+func (f ExtendedRouterFlowRecord) Encode(w io.Writer) {
 	// TODO
 }
