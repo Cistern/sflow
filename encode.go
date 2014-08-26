@@ -6,6 +6,8 @@ import (
 	"net"
 )
 
+// Encode encodes a slice of Records into an sFlow datagram.
+// Note: this function is a prototype and not guaranteed to be correct!
 func Encode(ip net.IP, subAgentId uint32, uptime uint32, sequenceNum uint32,
 	sampleSeqNum uint32, sourceType byte, sourceIndex uint32, records []Record) []byte {
 	payloads := []byte{}

@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// Sample represents an sFlow sample.
 type Sample interface {
 	SampleType() int
 	GetRecords() []Record

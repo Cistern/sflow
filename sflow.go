@@ -7,6 +7,8 @@ import (
 	"net"
 )
 
+// Datagram represents a decoded sFlow v5 datagram. It
+// contains a header and a slice of Samples.
 type Datagram struct {
 	Header  DatagramHeader
 	Samples []Sample
