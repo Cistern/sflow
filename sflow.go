@@ -24,19 +24,26 @@ type DatagramHeader struct {
 	NumSamples   uint32
 }
 
-func decodeDatagramHeader(r io.Reader) DatagramHeader {
-	header := DatagramHeader{}
+func decodeIP(r io.Reader) (uint32, net.IP) {
+	var version uint32
 
-	binary.Read(r, binary.BigEndian, &header.SflowVersion)
-	binary.Read(r, binary.BigEndian, &header.IpVersion)
+	binary.Read(r, binary.BigEndian, &version)
 	ipLen := 4
-	if header.IpVersion == 2 {
+	if version == 2 {
 		ipLen = 16
 	}
 
 	ipBuf := make([]byte, ipLen)
 	r.Read(ipBuf)
-	header.IpAddress = ipBuf
+
+	return version, ipBuf
+}
+
+func decodeDatagramHeader(r io.Reader) DatagramHeader {
+	header := DatagramHeader{}
+
+	binary.Read(r, binary.BigEndian, &header.SflowVersion)
+	header.IpVersion, header.IpAddress = decodeIP(r)
 
 	binary.Read(r, binary.BigEndian, &header.SubAgentId)
 	binary.Read(r, binary.BigEndian, &header.SequenceNum)

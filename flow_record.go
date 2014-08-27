@@ -174,9 +174,7 @@ func (f ExtendedSwitchFlowRecord) Encode(w io.Writer) {
 
 func decodeExtendedRouterFlowRecord(r io.Reader) ExtendedRouterFlowRecord {
 	f := ExtendedRouterFlowRecord{}
-	var ipBuf [16]byte
-	r.Read(ipBuf[:])
-	f.NextHop = net.IP(ipBuf[:])
+	_, f.NextHop = decodeIP(r)
 	binary.Read(r, binary.BigEndian, &f.SourceMaskLength)
 	binary.Read(r, binary.BigEndian, &f.DestMaskLength)
 	return f
