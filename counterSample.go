@@ -179,7 +179,7 @@ func (s *CounterSample) encode(w io.Writer) error {
 	}
 
 	// Fields
-	encodedSampleSize := uint32(4 + 1 + 3 + 4 + 4 + 4 + 4 + 4 + 4)
+	encodedSampleSize := uint32(4 + 1 + 3 + 4)
 
 	// Encoded records
 	encodedSampleSize += uint32(buf.Len())

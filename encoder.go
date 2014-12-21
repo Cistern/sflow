@@ -19,8 +19,8 @@ type Encoder struct {
 }
 
 // NewEncoder returns a new sFlow encoder.
-func NewEncoder(source net.IP, subAgentId uint32, initialSequenceNumber uint32) Encoder {
-	return Encoder{
+func NewEncoder(source net.IP, subAgentId uint32, initialSequenceNumber uint32) *Encoder {
+	return &Encoder{
 		ip:          source,
 		subAgentId:  subAgentId,
 		sequenceNum: initialSequenceNumber,
@@ -29,7 +29,7 @@ func NewEncoder(source net.IP, subAgentId uint32, initialSequenceNumber uint32) 
 
 // Encode encodes an sFlow v5 datagram with the given samples and
 // writes the packet to w.
-func (e Encoder) Encode(w io.Writer, samples []Sample) error {
+func (e *Encoder) Encode(w io.Writer, samples []Sample) error {
 	if samples == nil || len(samples) == 0 {
 		return ErrNoSamplesProvided
 	}
@@ -43,10 +43,10 @@ func (e Encoder) Encode(w io.Writer, samples []Sample) error {
 	}
 
 	// Check IP version
-	ipVersion := uint32(4)
+	ipVersion := uint32(1)
 	ipBytes := []byte(e.ip.To4())
 	if ipBytes == nil {
-		ipVersion = 6
+		ipVersion = 2
 		ipBytes = []byte(e.ip.To16())
 	}
 
