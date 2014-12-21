@@ -87,5 +87,7 @@ func (e Encoder) Encode(w io.Writer, samples []Sample) error {
 		}
 	}
 
+	e.sequenceNum++
+
 	return nil
 }
