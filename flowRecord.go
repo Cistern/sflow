@@ -13,6 +13,13 @@ type RawPacketFlow struct {
 	Header      []byte
 }
 
+type ExtendedSwitchFlowRecord struct {
+	SourceVlan          uint32
+	SourcePriority      uint32
+	DestinationVlan     uint32
+	DestinationPriority uint32
+}
+
 // RecordType returns the type of flow record.
 func (f RawPacketFlow) RecordType() int {
 	return TypeRawPacketFlowRecord
@@ -99,4 +106,35 @@ func (f RawPacketFlow) encode(w io.Writer) error {
 	_, err = w.Write(append(f.Header, make([]byte, (4-f.HeaderSize)%4)...))
 
 	return err
+}
+
+// RecordType returns the type of flow record.
+func (f ExtendedSwitchFlowRecord) RecordType() int {
+	return TypeExtendedSwitchFlowRecord
+}
+
+func decodedExtendedSwitchFlow(r io.Reader) (ExtendedSwitchFlowRecord, error) {
+	f := ExtendedSwitchFlowRecord{}
+
+	err := binary.Read(r, binary.BigEndian, &f)
+
+	return f, err
+}
+
+func (f ExtendedSwitchFlowRecord) encode(w io.Writer) error {
+	var err error
+
+	err = binary.Write(w, binary.BigEndian, uint32(f.RecordType()))
+	if err != nil {
+		return err
+	}
+
+	encodedRecordLength := uint32(4 * 4) // 4 32-bit records
+
+	err = binary.Write(w, binary.BigEndian, encodedRecordLength)
+	if err != nil {
+		return err
+	}
+
+	return binary.Write(w, binary.BigEndian, f)
 }

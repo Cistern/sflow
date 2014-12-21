@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDecodeGenericAndEthernetCounterSample(t *testing.T) {
+func TestDecodeGenericEthernetCounterSample(t *testing.T) {
 	f, err := os.Open("_test/counter_sample.dump")
 	if err != nil {
 		t.Fatal(err)
@@ -148,12 +148,8 @@ func TestDecodeFlow1(t *testing.T) {
 		t.Fatalf("expected a FlowSample, got %T", dgram.Samples[0])
 	}
 
-	if len(sample.Records) != 1 {
-		t.Fatalf("expected 1 record, got %d", len(sample.Records))
-	}
-
-	if len(sample.Records) != 1 {
-		t.Fatalf("expected 1 record, got %d", len(sample.Records))
+	if len(sample.Records) != 2 {
+		t.Fatalf("expected 2 records, got %d", len(sample.Records))
 	}
 
 	rec, ok := sample.Records[0].(RawPacketFlow)

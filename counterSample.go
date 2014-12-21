@@ -1,6 +1,7 @@
 package sflow
 
 import (
+	"bytes"
 	"encoding/binary"
 	"errors"
 	"io"
@@ -162,4 +163,53 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 	}
 
 	return s, nil
+}
+
+func (s *CounterSample) encode(w io.Writer) error {
+	var err error
+
+	// We first need to encode the records.
+	buf := &bytes.Buffer{}
+
+	for _, rec := range s.Records {
+		err = rec.encode(buf)
+		if err != nil {
+			return ErrEncodingRecord
+		}
+	}
+
+	// Fields
+	encodedSampleSize := uint32(4 + 1 + 3 + 4 + 4 + 4 + 4 + 4 + 4)
+
+	// Encoded records
+	encodedSampleSize += uint32(buf.Len())
+
+	err = binary.Write(w, binary.BigEndian, uint32(s.SampleType()))
+	if err != nil {
+		return err
+	}
+
+	err = binary.Write(w, binary.BigEndian, encodedSampleSize)
+	if err != nil {
+		return err
+	}
+
+	err = binary.Write(w, binary.BigEndian, s.SequenceNum)
+	if err != nil {
+		return err
+	}
+
+	err = binary.Write(w, binary.BigEndian, uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
+	if err != nil {
+		return err
+	}
+
+	err = binary.Write(w, binary.BigEndian, s.NumRecords)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.Copy(w, buf)
+
+	return err
 }
