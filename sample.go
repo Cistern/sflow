@@ -2,21 +2,10 @@ package sflow
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 )
 
-// Sample represents an sFlow sample.
-type Sample interface {
-	SampleType() int
-	GetRecords() []Record
-}
-
-type Record interface {
-	RecordType() int
-	Encode(io.Writer)
-}
-
-// Sample types
 const (
 	TypeFlowSample            = 1
 	TypeCounterSample         = 2
@@ -24,31 +13,42 @@ const (
 	TypeExpandedCounterSample = 4
 )
 
-type SampleDataHeader struct {
-	DataFormat   uint32
-	SampleLength uint32
+var (
+	ErrUnknownSampleType = errors.New("sflow: Unknown sample type")
+)
+
+type Sample interface {
+	SampleType() int
+	GetRecords() []Record
+	encode(w io.Writer) error
 }
 
-func DecodeSampleDataHeader(r io.ReadSeeker) SampleDataHeader {
-	sDH := SampleDataHeader{}
-	binary.Read(r, binary.BigEndian, &sDH)
-	return sDH
-}
+func decodeSample(r io.ReadSeeker) (Sample, error) {
+	format, length, err := uint32(0), uint32(0), error(nil)
 
-func DecodeSample(r io.ReadSeeker) Sample {
-	header := DecodeSampleDataHeader(r)
-
-	switch header.DataFormat {
-	case TypeCounterSample:
-		return decodeCounterSample(r)
-	case TypeFlowSample:
-		return decodeFlowSample(r)
-	case TypeExpandedFlowSample:
-		return decodeExpandedFlowSample(r)
-	default: // unknown sample type
-		r.Seek(int64(header.SampleLength), 1)
-		return nil
+	err = binary.Read(r, binary.BigEndian, &format)
+	if err != nil {
+		return nil, err
 	}
 
-	return nil
+	err = binary.Read(r, binary.BigEndian, &length)
+	if err != nil {
+		return nil, err
+	}
+
+	switch format {
+	case TypeCounterSample:
+		return decodeCounterSample(r)
+
+	case TypeFlowSample:
+		return decodeFlowSample(r)
+
+	default:
+		_, err = r.Seek(int64(length), 1)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, ErrUnknownSampleType
+	}
 }
