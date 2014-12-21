@@ -39,6 +39,7 @@ type FlowSample struct {
 	Records          []Record
 }
 
+// SampleType returns the type of sFlow sample.
 func (s *FlowSample) SampleType() int {
 	return TypeFlowSample
 }

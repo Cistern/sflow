@@ -31,6 +31,7 @@ type CounterSample struct {
 	Records          []Record
 }
 
+// SampleType returns the type of sFlow sample.
 func (s *CounterSample) SampleType() int {
 	return TypeCounterSample
 }
