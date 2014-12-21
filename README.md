@@ -1,4 +1,4 @@
-sflow [![Build Status](https://drone.io/github.com/PreetamJinka/sflow-go/status.png)](https://drone.io/github.com/PreetamJinka/sflow-go/latest) [![GoDoc](https://godoc.org/github.com/PreetamJinka/sflow-go?status.svg)](https://godoc.org/github.com/PreetamJinka/sflow-go)
+sflow [![Build Status](https://drone.io/github.com/PreetamJinka/sflow/status.png)](https://drone.io/github.com/PreetamJinka/sflow/latest) [![GoDoc](https://godoc.org/github.com/PreetamJinka/sflow?status.svg)](https://godoc.org/github.com/PreetamJinka/sflow) [![BSD License](https://img.shields.io/pypi/l/Django.svg)]()
 ====
 
 An [sFlow](http://sflow.org/) v5 encoding and decoding package for Go.
