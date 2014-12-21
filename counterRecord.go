@@ -172,6 +172,7 @@ var (
 	hostNetCountersSize          = uint32(unsafe.Sizeof(HostNetCounters{}))
 )
 
+// RecordType returns the type of counter record.
 func (c GenericInterfaceCounters) RecordType() int {
 	return TypeGenericInterfaceCountersRecord
 }
@@ -199,6 +200,7 @@ func (c GenericInterfaceCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c EthernetCounters) RecordType() int {
 	return TypeEthernetCountersRecord
 }
@@ -226,6 +228,7 @@ func (c EthernetCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c TokenRingCounters) RecordType() int {
 	return TypeTokenRingCountersRecord
 }
@@ -253,6 +256,7 @@ func (c TokenRingCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c VgCounters) RecordType() int {
 	return TypeVgCountersRecord
 }
@@ -280,6 +284,7 @@ func (c VgCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c VlanCounters) RecordType() int {
 	return TypeVlanCountersRecord
 }
@@ -307,6 +312,7 @@ func (c VlanCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c ProcessorCounters) RecordType() int {
 	return TypeProcessorCountersRecord
 }
@@ -334,6 +340,7 @@ func (c ProcessorCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c HostCpuCounters) RecordType() int {
 	return TypeHostCpuCountersRecord
 }
@@ -361,6 +368,7 @@ func (c HostCpuCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c HostMemoryCounters) RecordType() int {
 	return TypeHostMemoryCountersRecord
 }
@@ -415,6 +423,7 @@ func (c HostDiskCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c HostNetCounters) RecordType() int {
 	return TypeHostNetCountersRecord
 }

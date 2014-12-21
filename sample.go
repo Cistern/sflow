@@ -50,6 +50,4 @@ func decodeSample(r io.ReadSeeker) (Sample, error) {
 
 		return nil, ErrUnknownSampleType
 	}
-
-	return nil, errors.New("sflow: unknown decoding error")
 }
