@@ -36,7 +36,7 @@ type FlowSample struct {
 	Drops            uint32
 	Input            uint32
 	Output           uint32
-	NumRecords       uint32
+	numRecords       uint32
 	Records          []Record
 }
 
@@ -102,12 +102,12 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
-	err = binary.Read(r, binary.BigEndian, &s.NumRecords)
+	err = binary.Read(r, binary.BigEndian, &s.numRecords)
 	if err != nil {
 		return nil, err
 	}
 
-	for i := uint32(0); i < s.NumRecords; i++ {
+	for i := uint32(0); i < s.numRecords; i++ {
 		format, length := uint32(0), uint32(0)
 
 		err = binary.Read(r, binary.BigEndian, &format)
@@ -213,7 +213,7 @@ func (s *FlowSample) encode(w io.Writer) error {
 		return err
 	}
 
-	err = binary.Write(w, binary.BigEndian, s.NumRecords)
+	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}

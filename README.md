@@ -25,7 +25,6 @@ for _, sample := range dgram.Samples {
 		for _, record := range counterSample.Records {
 			// While there is a record.RecordType() method,
 			// you can always check types directly.
-
 			switch record.(type) {
 			case sflow.HostDiskCounters:
 				fmt.Printf("Max used percent of disk space is %d.\n",
@@ -36,9 +35,9 @@ for _, sample := range dgram.Samples {
 }
 ```
 
-Compatibility guarantees
+API guarantees
 ---
-API compatibility is *not guaranteed*. Vendoring or using a dependency manager is suggested.
+API stability is *not guaranteed*. Vendoring or using a dependency manager is suggested.
 
 Reporting issues
 ---

@@ -28,7 +28,7 @@ type CounterSample struct {
 	SequenceNum      uint32
 	SourceIdType     byte
 	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
-	NumRecords       uint32
+	numRecords       uint32
 	Records          []Record
 }
 
@@ -69,12 +69,12 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) | uint32(srcIdIndexVal[1]<<8) |
 		uint32(srcIdIndexVal[0]<<16)
 
-	err = binary.Read(r, binary.BigEndian, &s.NumRecords)
+	err = binary.Read(r, binary.BigEndian, &s.numRecords)
 	if err != nil {
 		return nil, err
 	}
 
-	for i := uint32(0); i < s.NumRecords; i++ {
+	for i := uint32(0); i < s.numRecords; i++ {
 		format, length := uint32(0), uint32(0)
 
 		err = binary.Read(r, binary.BigEndian, &format)
@@ -204,7 +204,7 @@ func (s *CounterSample) encode(w io.Writer) error {
 		return err
 	}
 
-	err = binary.Write(w, binary.BigEndian, s.NumRecords)
+	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}
