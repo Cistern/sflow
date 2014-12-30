@@ -5,6 +5,7 @@ import (
 	"io"
 )
 
+// RawPacketFlow is a raw Ethernet header flow record.
 type RawPacketFlow struct {
 	Protocol    uint32
 	FrameLength uint32
@@ -13,7 +14,8 @@ type RawPacketFlow struct {
 	Header      []byte
 }
 
-type ExtendedSwitchFlowRecord struct {
+// ExtendedSwitchFlow is an extended switch flow record.
+type ExtendedSwitchFlow struct {
 	SourceVlan          uint32
 	SourcePriority      uint32
 	DestinationVlan     uint32
@@ -109,19 +111,19 @@ func (f RawPacketFlow) encode(w io.Writer) error {
 }
 
 // RecordType returns the type of flow record.
-func (f ExtendedSwitchFlowRecord) RecordType() int {
+func (f ExtendedSwitchFlow) RecordType() int {
 	return TypeExtendedSwitchFlowRecord
 }
 
-func decodedExtendedSwitchFlow(r io.Reader) (ExtendedSwitchFlowRecord, error) {
-	f := ExtendedSwitchFlowRecord{}
+func decodedExtendedSwitchFlow(r io.Reader) (ExtendedSwitchFlow, error) {
+	f := ExtendedSwitchFlow{}
 
 	err := binary.Read(r, binary.BigEndian, &f)
 
 	return f, err
 }
 
-func (f ExtendedSwitchFlowRecord) encode(w io.Writer) error {
+func (f ExtendedSwitchFlow) encode(w io.Writer) error {
 	var err error
 
 	err = binary.Write(w, binary.BigEndian, uint32(f.RecordType()))

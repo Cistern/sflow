@@ -6,6 +6,7 @@ import (
 	"unsafe"
 )
 
+// GenericInterfaceCounters is a generic switch counters record.
 type GenericInterfaceCounters struct {
 	Index            uint32
 	Type             uint32
@@ -28,6 +29,7 @@ type GenericInterfaceCounters struct {
 	PromiscuousMode  uint32
 }
 
+// EthernetCounters is an Ethernet interface counters record.
 type EthernetCounters struct {
 	AlignmentErrors           uint32
 	FcsErrors                 uint32
@@ -44,6 +46,7 @@ type EthernetCounters struct {
 	SymbolErrors              uint32
 }
 
+// TokenRingCounters is a token ring interface counters record.
 type TokenRingCounters struct {
 	LineErrors         uint32
 	BurstErrors        uint32
@@ -65,6 +68,7 @@ type TokenRingCounters struct {
 	FreqErrors         uint32
 }
 
+// VgCounters is a BaseVG interface counters record.
 type VgCounters struct {
 	InHighPriorityFrames    uint32
 	InHighPriorityOctets    uint64
@@ -82,6 +86,7 @@ type VgCounters struct {
 	HCOutHighPriorityOctets uint64
 }
 
+// VlanCounters is a VLAN counters record.
 type VlanCounters struct {
 	Id            uint32
 	Octets        uint64
@@ -91,6 +96,7 @@ type VlanCounters struct {
 	Discards      uint32
 }
 
+// ProcessorCounters is a switch processor counters record.
 type ProcessorCounters struct {
 	Cpu5s    uint32
 	Cpu1m    uint32
@@ -99,6 +105,7 @@ type ProcessorCounters struct {
 	FreeMem  uint64
 }
 
+// HostCpuCounters is a host CPU counters record.
 type HostCpuCounters struct {
 	Load1m       float32
 	Load5m       float32
@@ -120,6 +127,7 @@ type HostCpuCounters struct {
 	ContextSwitches uint32
 }
 
+// HostMemoryCounters is a host memory counters record.
 type HostMemoryCounters struct {
 	Total     uint64
 	Free      uint64
@@ -135,6 +143,7 @@ type HostMemoryCounters struct {
 	SwapOut uint32
 }
 
+// HostDiskCounters is a host disk counters record.
 type HostDiskCounters struct {
 	Total          uint64
 	Free           uint64
@@ -147,6 +156,7 @@ type HostDiskCounters struct {
 	WriteTime      uint32
 }
 
+// HostNetCounters is a host network counters record.
 type HostNetCounters struct {
 	BytesIn   uint64
 	PacketsIn uint32
@@ -396,6 +406,7 @@ func (c HostMemoryCounters) encode(w io.Writer) error {
 	return err
 }
 
+// RecordType returns the type of counter record.
 func (c HostDiskCounters) RecordType() int {
 	return TypeHostDiskCountersRecord
 }
