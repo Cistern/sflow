@@ -2,8 +2,11 @@ package sflow
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 )
+
+var ErrUnsupportedDatagramVersion = errors.New("sflow: unsupported datagram version")
 
 type Decoder struct {
 	reader io.ReadSeeker
@@ -27,6 +30,10 @@ func (d *Decoder) Decode() (*Datagram, error) {
 	err = binary.Read(d.reader, binary.BigEndian, &dgram.Version)
 	if err != nil {
 		return nil, err
+	}
+
+	if dgram.Version != 5 {
+		return nil, ErrUnsupportedDatagramVersion
 	}
 
 	err = binary.Read(d.reader, binary.BigEndian, &dgram.IpVersion)
