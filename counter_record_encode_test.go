@@ -43,7 +43,7 @@ func TestEncodeDecodeGenericInterfaceCountersRecord(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	decoded, err := decodeGenericInterfaceCountersRecord(b)
+	decoded, err := decodeGenericInterfaceCountersRecord(b, uint32(b.Len()))
 	if err != nil {
 		t.Fatal(err)
 	}
