@@ -91,61 +91,61 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 
 		switch format {
 		case TypeGenericInterfaceCountersRecord:
-			rec, err = decodeGenericInterfaceCountersRecord(r)
+			rec, err = decodeGenericInterfaceCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeEthernetCountersRecord:
-			rec, err = decodeEthernetCountersRecord(r)
+			rec, err = decodeEthernetCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeTokenRingCountersRecord:
-			rec, err = decodeTokenRingCountersRecord(r)
+			rec, err = decodeTokenRingCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeVgCountersRecord:
-			rec, err = decodeVgCountersRecord(r)
+			rec, err = decodeVgCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeVlanCountersRecord:
-			rec, err = decodeVlanCountersRecord(r)
+			rec, err = decodeVlanCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeProcessorCountersRecord:
-			rec, err = decodeProcessorCountersRecord(r)
+			rec, err = decodeProcessorCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeHostCpuCountersRecord:
-			rec, err = decodeHostCpuCountersRecord(r)
+			rec, err = decodeHostCpuCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeHostMemoryCountersRecord:
-			rec, err = decodeHostMemoryCountersRecord(r)
+			rec, err = decodeHostMemoryCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeHostDiskCountersRecord:
-			rec, err = decodeHostDiskCountersRecord(r)
+			rec, err = decodeHostDiskCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
 
 		case TypeHostNetCountersRecord:
-			rec, err = decodeHostNetCountersRecord(r)
+			rec, err = decodeHostNetCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}

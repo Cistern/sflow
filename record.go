@@ -7,6 +7,7 @@ import (
 
 var (
 	ErrEncodingRecord = errors.New("sflow: failed to encode record")
+	ErrDecodingRecord = errors.New("sflow: failed to decode record")
 )
 
 type Record interface {
