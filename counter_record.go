@@ -361,7 +361,21 @@ func (c HostCpuCounters) RecordType() int {
 
 func decodeHostCpuCountersRecord(r io.Reader, length uint32) (HostCpuCounters, error) {
 	c := HostCpuCounters{}
-	err := binary.Read(r, binary.BigEndian, &c)
+
+	b := make([]byte, int(length))
+	n, _ := r.Read(b)
+	if n != int(length) {
+		return c, ErrDecodingRecord
+	}
+
+	fields := []interface{}{&c.Load1m, &c.Load5m, &c.Load15m,
+		&c.ProcsRunning, &c.ProcsTotal, &c.NumCPU, &c.SpeedCPU, &c.Uptime,
+		&c.CpuUser, &c.CpuNice, &c.CpuSys, &c.CpuIdle, &c.CpuWio, &c.CpuIntr,
+		&c.CpuSoftIntr, &c.Interrupts, &c.ContextSwitches, &c.CpuSteal,
+		&c.CpuGuest, &c.CpuGuestNice}
+
+	err := readFields(b, fields)
+
 	return c, err
 }
 
