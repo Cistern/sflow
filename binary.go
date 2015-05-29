@@ -11,6 +11,9 @@ var (
 	ErrInvalidFieldType   = errors.New("sflow: field type")
 )
 
+// readFields reads big-endian encoded numbers from b into
+// elements of fields, which should be pointers to numbers,
+// e.g. *uint32 or *float32.
 func readFields(b []byte, fields []interface{}) error {
 	for len(b) > 0 && len(fields) > 0 {
 		field := fields[0]

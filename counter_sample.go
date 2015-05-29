@@ -15,7 +15,7 @@ const (
 	TypeVlanCountersRecord             = 5
 
 	TypeProcessorCountersRecord  = 1001
-	TypeHostCpuCountersRecord    = 2003
+	TypeHostCPUCountersRecord    = 2003
 	TypeHostMemoryCountersRecord = 2004
 	TypeHostDiskCountersRecord   = 2005
 	TypeHostNetCountersRecord    = 2006
@@ -126,8 +126,8 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 				return nil, err
 			}
 
-		case TypeHostCpuCountersRecord:
-			rec, err = decodeHostCpuCountersRecord(r, length)
+		case TypeHostCPUCountersRecord:
+			rec, err = decodeHostCPUCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}

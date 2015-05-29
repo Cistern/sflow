@@ -8,41 +8,41 @@ import (
 
 // GenericInterfaceCounters is a generic switch counters record.
 type GenericInterfaceCounters struct {
-	Index            uint32
-	Type             uint32
-	Speed            uint64
-	Direction        uint32
-	Status           uint32
-	InOctets         uint64
-	InUcastPkts      uint32
-	InMulticastPkts  uint32
-	InBroadcastPkts  uint32
-	InDiscards       uint32
-	InErrors         uint32
-	InUnknownProtos  uint32
-	OutOctets        uint64
-	OutUcastPkts     uint32
-	OutMulticastPkts uint32
-	OutBroadcastPkts uint32
-	OutDiscards      uint32
-	OutErrors        uint32
-	PromiscuousMode  uint32
+	Index               uint32
+	Type                uint32
+	Speed               uint64
+	Direction           uint32
+	Status              uint32
+	InOctets            uint64
+	InUnicastPackets    uint32
+	InMulticastPackets  uint32
+	InBroadcastPackets  uint32
+	InDiscards          uint32
+	InErrors            uint32
+	InUnknownProtocols  uint32
+	OutOctets           uint64
+	OutUnicastPackets   uint32
+	OutMulticastPackets uint32
+	OutBroadcastPackets uint32
+	OutDiscards         uint32
+	OutErrors           uint32
+	PromiscuousMode     uint32
 }
 
 // EthernetCounters is an Ethernet interface counters record.
 type EthernetCounters struct {
 	AlignmentErrors           uint32
-	FcsErrors                 uint32
+	FCSErrors                 uint32
 	SingleCollisionFrames     uint32
 	MultipleCollisionFrames   uint32
-	SqeTestErrors             uint32
+	SQETestErrors             uint32
 	DeferredTransmissions     uint32
 	LateCollisions            uint32
 	ExcessiveCollisions       uint32
-	InternalMacTransmitErrors uint32
+	InternalMACTransmitErrors uint32
 	CarrierSenseErrors        uint32
 	FrameTooLongs             uint32
-	InternalMacReceiveErrors  uint32
+	InternalMACReceiveErrors  uint32
 	SymbolErrors              uint32
 }
 
@@ -88,47 +88,47 @@ type VgCounters struct {
 
 // VlanCounters is a VLAN counters record.
 type VlanCounters struct {
-	Id            uint32
-	Octets        uint64
-	UcastPkts     uint32
-	MulticastPkts uint32
-	BroadcastPkts uint32
-	Discards      uint32
+	ID               uint32
+	Octets           uint64
+	UnicastPackets   uint32
+	MulticastPackets uint32
+	BroadcastPackets uint32
+	Discards         uint32
 }
 
 // ProcessorCounters is a switch processor counters record.
 type ProcessorCounters struct {
-	Cpu5s    uint32
-	Cpu1m    uint32
-	Cpu5m    uint32
-	TotalMem uint64
-	FreeMem  uint64
+	CPU5s       uint32
+	CPU1m       uint32
+	CPU5m       uint32
+	TotalMemory uint64
+	FreeMemory  uint64
 }
 
-// HostCpuCounters is a host CPU counters record.
-type HostCpuCounters struct {
-	Load1m       float32
-	Load5m       float32
-	Load15m      float32
-	ProcsRunning uint32
-	ProcsTotal   uint32
-	NumCPU       uint32
-	SpeedCPU     uint32
-	Uptime       uint32
+// HostCPUCounters is a host CPU counters record.
+type HostCPUCounters struct {
+	Load1m           float32
+	Load5m           float32
+	Load15m          float32
+	ProcessesRunning uint32
+	ProcessesTotal   uint32
+	NumCPU           uint32
+	SpeedCPU         uint32
+	Uptime           uint32
 
-	CpuUser         uint32
-	CpuNice         uint32
-	CpuSys          uint32
-	CpuIdle         uint32
-	CpuWio          uint32
-	CpuIntr         uint32
-	CpuSoftIntr     uint32
+	CPUUser         uint32
+	CPUNice         uint32
+	CPUSys          uint32
+	CPUIdle         uint32
+	CPUWio          uint32
+	CPUIntr         uint32
+	CPUSoftIntr     uint32
 	Interrupts      uint32
 	ContextSwitches uint32
 
-	CpuSteal     uint32
-	CpuGuest     uint32
-	CpuGuestNice uint32
+	CPUSteal     uint32
+	CPUGuest     uint32
+	CPUGuestNice uint32
 }
 
 // HostMemoryCounters is a host memory counters record.
@@ -164,12 +164,12 @@ type HostDiskCounters struct {
 type HostNetCounters struct {
 	BytesIn   uint64
 	PacketsIn uint32
-	ErrsIn    uint32
+	ErrorsIn  uint32
 	DropsIn   uint32
 
 	BytesOut   uint64
 	PacketsOut uint32
-	ErrsOut    uint32
+	ErrorsOut  uint32
 	DropsOut   uint32
 }
 
@@ -180,7 +180,7 @@ var (
 	vgCountersSize               = uint32(unsafe.Sizeof(VgCounters{}))
 	vlanCountersSize             = uint32(unsafe.Sizeof(VlanCounters{}))
 	processorCountersSize        = uint32(unsafe.Sizeof(ProcessorCounters{}))
-	hostCpuCountersSize          = uint32(unsafe.Sizeof(HostCpuCounters{}))
+	hostCPUCountersSize          = uint32(unsafe.Sizeof(HostCPUCounters{}))
 	hostMemoryCountersSize       = uint32(unsafe.Sizeof(HostMemoryCounters{}))
 	hostDiskCountersSize         = uint32(unsafe.Sizeof(HostDiskCounters{}))
 	hostNetCountersSize          = uint32(unsafe.Sizeof(HostNetCounters{}))
@@ -206,16 +206,16 @@ func decodeGenericInterfaceCountersRecord(r io.Reader, length uint32) (GenericIn
 		&c.Direction,
 		&c.Status,
 		&c.InOctets,
-		&c.InUcastPkts,
-		&c.InMulticastPkts,
-		&c.InBroadcastPkts,
+		&c.InUnicastPackets,
+		&c.InMulticastPackets,
+		&c.InBroadcastPackets,
 		&c.InDiscards,
 		&c.InErrors,
-		&c.InUnknownProtos,
+		&c.InUnknownProtocols,
 		&c.OutOctets,
-		&c.OutUcastPkts,
-		&c.OutMulticastPkts,
-		&c.OutBroadcastPkts,
+		&c.OutUnicastPackets,
+		&c.OutMulticastPackets,
+		&c.OutBroadcastPackets,
 		&c.OutDiscards,
 		&c.OutErrors,
 		&c.PromiscuousMode,
@@ -256,17 +256,17 @@ func decodeEthernetCountersRecord(r io.Reader, length uint32) (EthernetCounters,
 
 	fields := []interface{}{
 		&c.AlignmentErrors,
-		&c.FcsErrors,
+		&c.FCSErrors,
 		&c.SingleCollisionFrames,
 		&c.MultipleCollisionFrames,
-		&c.SqeTestErrors,
+		&c.SQETestErrors,
 		&c.DeferredTransmissions,
 		&c.LateCollisions,
 		&c.ExcessiveCollisions,
-		&c.InternalMacTransmitErrors,
+		&c.InternalMACTransmitErrors,
 		&c.CarrierSenseErrors,
 		&c.FrameTooLongs,
-		&c.InternalMacReceiveErrors,
+		&c.InternalMACReceiveErrors,
 		&c.SymbolErrors,
 	}
 
@@ -408,11 +408,11 @@ func decodeVlanCountersRecord(r io.Reader, length uint32) (VlanCounters, error) 
 	}
 
 	fields := []interface{}{
-		&c.Id,
+		&c.ID,
 		&c.Octets,
-		&c.UcastPkts,
-		&c.MulticastPkts,
-		&c.BroadcastPkts,
+		&c.UnicastPackets,
+		&c.MulticastPackets,
+		&c.BroadcastPackets,
 		&c.Discards,
 	}
 
@@ -450,11 +450,11 @@ func decodeProcessorCountersRecord(r io.Reader, length uint32) (ProcessorCounter
 	}
 
 	fields := []interface{}{
-		&c.Cpu5s,
-		&c.Cpu1m,
-		&c.Cpu5m,
-		&c.TotalMem,
-		&c.FreeMem,
+		&c.CPU5s,
+		&c.CPU1m,
+		&c.CPU5m,
+		&c.TotalMemory,
+		&c.FreeMemory,
 	}
 
 	return c, readFields(b, fields)
@@ -478,12 +478,12 @@ func (c ProcessorCounters) encode(w io.Writer) error {
 }
 
 // RecordType returns the type of counter record.
-func (c HostCpuCounters) RecordType() int {
-	return TypeHostCpuCountersRecord
+func (c HostCPUCounters) RecordType() int {
+	return TypeHostCPUCountersRecord
 }
 
-func decodeHostCpuCountersRecord(r io.Reader, length uint32) (HostCpuCounters, error) {
-	c := HostCpuCounters{}
+func decodeHostCPUCountersRecord(r io.Reader, length uint32) (HostCPUCounters, error) {
+	c := HostCPUCounters{}
 	b := make([]byte, int(length))
 	n, _ := r.Read(b)
 	if n != int(length) {
@@ -494,29 +494,29 @@ func decodeHostCpuCountersRecord(r io.Reader, length uint32) (HostCpuCounters, e
 		&c.Load1m,
 		&c.Load5m,
 		&c.Load15m,
-		&c.ProcsRunning,
-		&c.ProcsTotal,
+		&c.ProcessesRunning,
+		&c.ProcessesTotal,
 		&c.NumCPU,
 		&c.SpeedCPU,
 		&c.Uptime,
-		&c.CpuUser,
-		&c.CpuNice,
-		&c.CpuSys,
-		&c.CpuIdle,
-		&c.CpuWio,
-		&c.CpuIntr,
-		&c.CpuSoftIntr,
+		&c.CPUUser,
+		&c.CPUNice,
+		&c.CPUSys,
+		&c.CPUIdle,
+		&c.CPUWio,
+		&c.CPUIntr,
+		&c.CPUSoftIntr,
 		&c.Interrupts,
 		&c.ContextSwitches,
-		&c.CpuSteal,
-		&c.CpuGuest,
-		&c.CpuGuestNice,
+		&c.CPUSteal,
+		&c.CPUGuest,
+		&c.CPUGuestNice,
 	}
 
 	return c, readFields(b, fields)
 }
 
-func (c HostCpuCounters) encode(w io.Writer) error {
+func (c HostCPUCounters) encode(w io.Writer) error {
 	var err error
 
 	err = binary.Write(w, binary.BigEndian, uint32(c.RecordType()))
@@ -524,7 +524,7 @@ func (c HostCpuCounters) encode(w io.Writer) error {
 		return err
 	}
 
-	err = binary.Write(w, binary.BigEndian, hostCpuCountersSize)
+	err = binary.Write(w, binary.BigEndian, hostCPUCountersSize)
 	if err != nil {
 		return err
 	}
@@ -641,11 +641,11 @@ func decodeHostNetCountersRecord(r io.Reader, length uint32) (HostNetCounters, e
 	fields := []interface{}{
 		&c.BytesIn,
 		&c.PacketsIn,
-		&c.ErrsIn,
+		&c.ErrorsIn,
 		&c.DropsIn,
 		&c.BytesOut,
 		&c.PacketsOut,
-		&c.ErrsOut,
+		&c.ErrorsOut,
 		&c.DropsOut,
 	}
 

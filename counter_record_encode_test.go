@@ -7,25 +7,25 @@ import (
 
 func TestEncodeDecodeGenericInterfaceCountersRecord(t *testing.T) {
 	rec := GenericInterfaceCounters{
-		Index:            9,
-		Type:             6,
-		Speed:            100000000,
-		Direction:        1,
-		Status:           3,
-		InOctets:         79282473,
-		InUcastPkts:      329128,
-		InMulticastPkts:  0,
-		InBroadcastPkts:  1493,
-		InDiscards:       0,
-		InErrors:         0,
-		InUnknownProtos:  0,
-		OutOctets:        764247430,
-		OutUcastPkts:     9470970,
-		OutMulticastPkts: 780342,
-		OutBroadcastPkts: 877721,
-		OutDiscards:      0,
-		OutErrors:        0,
-		PromiscuousMode:  1,
+		Index:               9,
+		Type:                6,
+		Speed:               100000000,
+		Direction:           1,
+		Status:              3,
+		InOctets:            79282473,
+		InUnicastPackets:    329128,
+		InMulticastPackets:  0,
+		InBroadcastPackets:  1493,
+		InDiscards:          0,
+		InErrors:            0,
+		InUnknownProtocols:  0,
+		OutOctets:           764247430,
+		OutUnicastPackets:   9470970,
+		OutMulticastPackets: 780342,
+		OutBroadcastPackets: 877721,
+		OutDiscards:         0,
+		OutErrors:           0,
+		PromiscuousMode:     1,
 	}
 
 	b := &bytes.Buffer{}
@@ -54,29 +54,29 @@ func TestEncodeDecodeGenericInterfaceCountersRecord(t *testing.T) {
 }
 
 func TestEncodeDecodeHostCPUCountersRecord(t *testing.T) {
-	rec := HostCpuCounters{
-		Load1m:       0.1,
-		Load5m:       0.2,
-		Load15m:      0.3,
-		ProcsRunning: 4,
-		ProcsTotal:   5,
-		NumCPU:       6,
-		SpeedCPU:     7,
-		Uptime:       8,
+	rec := HostCPUCounters{
+		Load1m:           0.1,
+		Load5m:           0.2,
+		Load15m:          0.3,
+		ProcessesRunning: 4,
+		ProcessesTotal:   5,
+		NumCPU:           6,
+		SpeedCPU:         7,
+		Uptime:           8,
 
-		CpuUser:         9,
-		CpuNice:         10,
-		CpuSys:          11,
-		CpuIdle:         12,
-		CpuWio:          13,
-		CpuIntr:         14,
-		CpuSoftIntr:     15,
+		CPUUser:         9,
+		CPUNice:         10,
+		CPUSys:          11,
+		CPUIdle:         12,
+		CPUWio:          13,
+		CPUIntr:         14,
+		CPUSoftIntr:     15,
 		Interrupts:      16,
 		ContextSwitches: 17,
 
-		CpuSteal:     18,
-		CpuGuest:     19,
-		CpuGuestNice: 20,
+		CPUSteal:     18,
+		CPUGuest:     19,
+		CPUGuestNice: 20,
 	}
 
 	b := &bytes.Buffer{}
@@ -94,7 +94,7 @@ func TestEncodeDecodeHostCPUCountersRecord(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	decoded, err := decodeHostCpuCountersRecord(b, uint32(b.Len()))
+	decoded, err := decodeHostCPUCountersRecord(b, uint32(b.Len()))
 	if err != nil {
 		t.Fatal(err)
 	}
