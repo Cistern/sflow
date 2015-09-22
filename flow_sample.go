@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -38,6 +39,18 @@ type FlowSample struct {
 	Output           uint32
 	numRecords       uint32
 	Records          []Record
+}
+
+func (s FlowSample) String() string {
+	str := fmt.Sprintf(`FlowSample: SequenceNum: %d, SourceIdType: %d, SourceIdIndexVal: %d, SamplingRate: %d, SamplePool: %d, Drops: %d, Input: %d, Output: %d
+Records:`, s.SequenceNum, s.SourceIdType, s.SourceIdIndexVal, s.SamplingRate, s.SamplePool, s.Drops, s.Input, s.Output)
+	for _, r := range s.Records {
+		switch t := r.(type) {
+		default:
+			str += fmt.Sprintf("\n	%v", t)
+		}
+	}
+	return str
 }
 
 // SampleType returns the type of sFlow sample.

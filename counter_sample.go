@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"fmt"
 	"io"
 )
 
@@ -30,6 +31,18 @@ type CounterSample struct {
 	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
 	numRecords       uint32
 	Records          []Record
+}
+
+func (s CounterSample) String() string {
+	str := fmt.Sprintf(`CounterSample: SequenceNum: %d, SourceIdType: %d, SourceIdIndexVal: %d
+Records:`, s.SequenceNum, s.SourceIdType, s.SourceIdIndexVal)
+	for _, r := range s.Records {
+		switch t := r.(type) {
+		default:
+			str += fmt.Sprintf("\n	%v", t)
+		}
+	}
+	return str
 }
 
 // SampleType returns the type of sFlow sample.
