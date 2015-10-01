@@ -34,15 +34,9 @@ type CounterSample struct {
 }
 
 func (s CounterSample) String() string {
-	str := fmt.Sprintf(`CounterSample: SequenceNum: %d, SourceIdType: %d, SourceIdIndexVal: %d
-Records:`, s.SequenceNum, s.SourceIdType, s.SourceIdIndexVal)
-	for _, r := range s.Records {
-		switch t := r.(type) {
-		default:
-			str += fmt.Sprintf("\n	%v", t)
-		}
-	}
-	return str
+	type X CounterSample
+	x := X(s)
+	return fmt.Sprintf("CounterSample: %+v", x)
 }
 
 // SampleType returns the type of sFlow sample.
@@ -79,7 +73,8 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 		return nil, errors.New("sflow: counter sample decoding error")
 	}
 
-	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) | uint32(srcIdIndexVal[1]<<8) |
+	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
+		uint32(srcIdIndexVal[1]<<8) |
 		uint32(srcIdIndexVal[0]<<16)
 
 	err = binary.Read(r, binary.BigEndian, &s.numRecords)
@@ -108,73 +103,60 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeEthernetCountersRecord:
 			rec, err = decodeEthernetCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeTokenRingCountersRecord:
 			rec, err = decodeTokenRingCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeVgCountersRecord:
 			rec, err = decodeVgCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeVlanCountersRecord:
 			rec, err = decodeVlanCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeProcessorCountersRecord:
 			rec, err = decodeProcessorCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeHostCPUCountersRecord:
 			rec, err = decodeHostCPUCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeHostMemoryCountersRecord:
 			rec, err = decodeHostMemoryCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeHostDiskCountersRecord:
 			rec, err = decodeHostDiskCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		case TypeHostNetCountersRecord:
 			rec, err = decodeHostNetCountersRecord(r, length)
 			if err != nil {
 				return nil, err
 			}
-
 		default:
 			_, err := r.Seek(int64(length), 1)
 			if err != nil {
 				return nil, err
 			}
-
 			continue
 		}
-
 		s.Records = append(s.Records, rec)
 	}
-
 	return s, nil
 }
 
@@ -201,28 +183,25 @@ func (s *CounterSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, encodedSampleSize)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.SequenceNum)
 	if err != nil {
 		return err
 	}
-
-	err = binary.Write(w, binary.BigEndian, uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
+	err = binary.Write(w, binary.BigEndian,
+		uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
 	if err != nil {
 		return err
 	}
-
-	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
+	err = binary.Write(w, binary.BigEndian,
+		uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}
 
 	_, err = io.Copy(w, buf)
-
 	return err
 }

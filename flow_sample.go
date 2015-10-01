@@ -42,15 +42,9 @@ type FlowSample struct {
 }
 
 func (s FlowSample) String() string {
-	str := fmt.Sprintf(`FlowSample: SequenceNum: %d, SourceIdType: %d, SourceIdIndexVal: %d, SamplingRate: %d, SamplePool: %d, Drops: %d, Input: %d, Output: %d
-Records:`, s.SequenceNum, s.SourceIdType, s.SourceIdIndexVal, s.SamplingRate, s.SamplePool, s.Drops, s.Input, s.Output)
-	for _, r := range s.Records {
-		switch t := r.(type) {
-		default:
-			str += fmt.Sprintf("\n	%v", t)
-		}
-	}
-	return str
+	type X FlowSample
+	x := X(s)
+	return fmt.Sprintf("FlowSample: %+v", x)
 }
 
 // SampleType returns the type of sFlow sample.
@@ -87,7 +81,8 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, errors.New("sflow: counter sample decoding error")
 	}
 
-	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) | uint32(srcIdIndexVal[1]<<8) |
+	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
+		uint32(srcIdIndexVal[1]<<8) |
 		uint32(srcIdIndexVal[0]<<16)
 
 	err = binary.Read(r, binary.BigEndian, &s.SamplingRate)
@@ -185,53 +180,44 @@ func (s *FlowSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, encodedSampleSize)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.SequenceNum)
 	if err != nil {
 		return err
 	}
-
-	err = binary.Write(w, binary.BigEndian, uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
+	err = binary.Write(w, binary.BigEndian,
+		uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.SamplingRate)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.SamplePool)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.Drops)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.Input)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, s.Output)
 	if err != nil {
 		return err
 	}
-
 	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}
 
 	_, err = io.Copy(w, buf)
-
 	return err
 }
