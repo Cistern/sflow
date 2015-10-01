@@ -31,8 +31,9 @@ type GenericInterfaceCounters struct {
 }
 
 func (c GenericInterfaceCounters) String() string {
-	return fmt.Sprintf(`GenericInterfaceCounters: Index: %d, Type: %d, Speed: %d, Direction: %d, Status: %d, InOctets: %d, InUnicastPackets: %d, InMulticastPackets: %d, InBroadcastPackets: %d, InDiscards: %d, InErrors: %d, InUnknownProtocols: %d, OutOctets: %d, OutUnicastPackets: %d, OutMulticastPackets: %d, OutBroadcastPackets: %d, OutDiscards: %d, OutDiscards: %d, OutErrors: %d, PromiscuousMode: %d
-`, c.Index, c.Type, c.Speed, c.Direction, c.Status, c.InOctets, c.InUnicastPackets, c.InMulticastPackets, c.InBroadcastPackets, c.InDiscards, c.InErrors, c.InUnknownProtocols, c.OutOctets, c.OutUnicastPackets, c.OutMulticastPackets, c.OutBroadcastPackets, c.OutDiscards, c.OutErrors, c.PromiscuousMode)
+	type X GenericInterfaceCounters
+	x := X(c)
+	return fmt.Sprintf("GenericInterfaceCounters: %+v", x)
 }
 
 // EthernetCounters is an Ethernet interface counters record.
@@ -53,8 +54,9 @@ type EthernetCounters struct {
 }
 
 func (c EthernetCounters) String() string {
-	return fmt.Sprintf(`EthernetCounters: AlignmentErrors: %d, FCSErrors: %d, SingleCollisionFrames: %d, MultipleCollisionFrames: %d, SQETestErrors: %d, DeferredTransmissions: %d, LateCollisions: %d, ExcessiveCollisions: %d, InternalMACTransmitErrors: %d, CarrierSenseErrors: %d, FrameTooLongs: %d, InternalMACReceiveErrors: %d, SymbolErrors: %d
-`, c.AlignmentErrors, c.FCSErrors, c.SingleCollisionFrames, c.MultipleCollisionFrames, c.SQETestErrors, c.DeferredTransmissions, c.LateCollisions, c.ExcessiveCollisions, c.InternalMACTransmitErrors, c.CarrierSenseErrors, c.FrameTooLongs, c.InternalMACReceiveErrors, c.SymbolErrors)
+	type X EthernetCounters
+	x := X(c)
+	return fmt.Sprintf("EthernetCounters: %+v", x)
 }
 
 // TokenRingCounters is a token ring interface counters record.
@@ -80,8 +82,9 @@ type TokenRingCounters struct {
 }
 
 func (c TokenRingCounters) String() string {
-	return fmt.Sprintf(`TokenRingCounters: LineErrors: %d, BurstErrors: %d, ACErrors: %d, AbortTransErrors: %d, InternalErrors: %d, LostFrameErrors: %d, ReceiveCongestions: %d, FrameCopiedErrors: %d, TokenErrors: %d, SoftErrors: %d, HardErrors: %d, SignalLoss: %d, TransmitBeacons: %d, Recoverys: %d, LobeWires: %d, Removes: %d, Singles: %d, FreqErrors: %d
-`, c.LineErrors, c.BurstErrors, c.ACErrors, c.AbortTransErrors, c.InternalErrors, c.LostFrameErrors, c.ReceiveCongestions, c.FrameCopiedErrors, c.TokenErrors, c.SoftErrors, c.HardErrors, c.SignalLoss, c.TransmitBeacons, c.Recoverys, c.LobeWires, c.Removes, c.Singles, c.FreqErrors)
+	type X TokenRingCounters
+	x := X(c)
+	return fmt.Sprintf("TokenRingCounters: %+v", x)
 }
 
 // VgCounters is a BaseVG interface counters record.
@@ -103,8 +106,9 @@ type VgCounters struct {
 }
 
 func (c VgCounters) String() string {
-	return fmt.Sprintf(`VgCounters: InHighPriorityFrames: %d, InHighPriorityOctets: %d, InNormPriorityFrames: %d, InNormPriorityOctets: %d, InIPMErrors: %d, InOversizeFrameErrors: %d, InDataErrors: %d, InNullAddressedFrames: %d, OutHighPriorityFrames: %d, OutHighPriorityOctets: %d, TransitionIntoTrainings: %d, HCInHighPriorityOctets: %d, HCInNormPriorityOctets: %d, HCOutHighPriorityOctets: %d
-`, c.InHighPriorityFrames, c.InHighPriorityOctets, c.InNormPriorityFrames, c.InNormPriorityOctets, c.InIPMErrors, c.InOversizeFrameErrors, c.InDataErrors, c.InNullAddressedFrames, c.OutHighPriorityFrames, c.OutHighPriorityOctets, c.TransitionIntoTrainings, c.HCInHighPriorityOctets, c.HCInNormPriorityOctets, c.HCOutHighPriorityOctets)
+	type X VgCounters
+	x := X(c)
+	return fmt.Sprintf("VgCounters: %+v", x)
 }
 
 // VlanCounters is a VLAN counters record.
@@ -118,8 +122,9 @@ type VlanCounters struct {
 }
 
 func (c VlanCounters) String() string {
-	return fmt.Sprintf(`VlanCounters: ID: %d, Octets: %d, UnicastPackets: %d, MulticastPackets: %d, BroadcastPackets: %d, Discards: %d
-`, c.ID, c.Octets, c.UnicastPackets, c.MulticastPackets, c.BroadcastPackets, c.Discards)
+	type X VlanCounters
+	x := X(c)
+	return fmt.Sprintf("VlanCounters: %+v", x)
 }
 
 // ProcessorCounters is a switch processor counters record.
@@ -132,8 +137,9 @@ type ProcessorCounters struct {
 }
 
 func (c ProcessorCounters) String() string {
-	return fmt.Sprintf(`ProcessorCounters: CPU5s: %d, CPU1m: %d, CPU5m: %d, TotalMemory: %d, FreeMemory: %d
-`, c.CPU5s, c.CPU1m, c.CPU5m, c.TotalMemory, c.FreeMemory)
+	type X ProcessorCounters
+	x := X(c)
+	return fmt.Sprintf("ProcessorCounters: %+v", x)
 }
 
 // HostCPUCounters is a host CPU counters record.
@@ -163,8 +169,9 @@ type HostCPUCounters struct {
 }
 
 func (c HostCPUCounters) String() string {
-	return fmt.Sprintf(`HostCPUCounters: Load1m: %f, Load5m: %f, Load15m: %f, ProcessesRunning: %d, ProcessesTotal: %d, NumCPU: %d, SpeedCPU: %d, Uptime: %d, CPUUser: %d, CPUNice: %d, CPUSys: %d, CPUIdle: %d, CPUWio: %d, CPUIntr: %d, CPUSoftIntr: %d, Interrupts: %d, ContextSwitches: %d, CPUSteal: %d, CPUGuest: %d, CPUGuestNice: %d
-`, c.Load1m, c.Load5m, c.Load15m, c.ProcessesRunning, c.ProcessesTotal, c.NumCPU, c.SpeedCPU, c.Uptime, c.CPUUser, c.CPUNice, c.CPUSys, c.CPUIdle, c.CPUWio, c.CPUIntr, c.CPUSoftIntr, c.Interrupts, c.ContextSwitches, c.CPUSteal, c.CPUGuest, c.CPUGuestNice)
+	type X HostCPUCounters
+	x := X(c)
+	return fmt.Sprintf("HostCPUCounters: %+v", x)
 }
 
 // HostMemoryCounters is a host memory counters record.
@@ -184,8 +191,9 @@ type HostMemoryCounters struct {
 }
 
 func (c HostMemoryCounters) String() string {
-	return fmt.Sprintf(`HostMemoryCounters: Total: %d, Free: %d, Shared: %d, Buffers: %d, Cached: %d, SwapTotal: %d, SwapFree: %d, PageIn: %d, PageOut: %d, SwapIn: %d, SwapOut: %d
-`, c.Total, c.Free, c.Shared, c.Buffers, c.Cached, c.SwapTotal, c.SwapFree, c.PageIn, c.PageOut, c.SwapIn, c.SwapOut)
+	type X HostMemoryCounters
+	x := X(c)
+	return fmt.Sprintf("HostMemoryCounters: %+v", x)
 }
 
 // HostDiskCounters is a host disk counters record.
@@ -202,8 +210,9 @@ type HostDiskCounters struct {
 }
 
 func (c HostDiskCounters) String() string {
-	return fmt.Sprintf(`HostDiskCounters: Total: %d, Free: %d, MaxUsedPercent: %f, Reads: %d, BytesRead: %d, ReadTime: %d, Writes: %d, BytesWritten: %d, WriteTime: %d
-`, c.Total, c.Free, c.MaxUsedPercent, c.Reads, c.BytesRead, c.ReadTime, c.Writes, c.BytesWritten, c.WriteTime)
+	type X HostDiskCounters
+	x := X(c)
+	return fmt.Sprintf("HostDiskCounters: %+v", x)
 }
 
 // HostNetCounters is a host network counters record.
@@ -220,8 +229,9 @@ type HostNetCounters struct {
 }
 
 func (c HostNetCounters) String() string {
-	return fmt.Sprintf(`HostNetCounters: BytesIn: %d, PacketsIn: %d, ErrorsIn: %d, DropsIn: %d, BytesOut: %d, PacketsOut: %d, ErrorsOut: %d, DropsOut: %d
-`, c.BytesIn, c.PacketsIn, c.ErrorsIn, c.DropsIn, c.BytesOut, c.PacketsOut, c.ErrorsOut, c.DropsOut)
+	type X HostNetCounters
+	x := X(c)
+	return fmt.Sprintf("HostNetCounters: %+v", x)
 }
 
 var (

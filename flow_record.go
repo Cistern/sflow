@@ -16,8 +16,9 @@ type RawPacketFlow struct {
 }
 
 func (f RawPacketFlow) String() string {
-	return fmt.Sprintf(`RawPacketFlow: Protocol: %d (%x), FrameLength: %d, Stripped: %d, HeaderSize: %d
-`, f.Protocol, f.Protocol, f.FrameLength, f.Stripped, f.HeaderSize)
+	type X RawPacketFlow
+	x := X(f)
+	return fmt.Sprintf("RawPacketFlow: %+v", x)
 }
 
 // ExtendedSwitchFlow is an extended switch flow record.
@@ -29,8 +30,9 @@ type ExtendedSwitchFlow struct {
 }
 
 func (f ExtendedSwitchFlow) String() string {
-	return fmt.Sprintf(`ExtendedSwitchFlow: SourceVlan: %d, SourcePriority: %d, DestinationVlan: %d, DestinationPriority: %d
-`, f.SourceVlan, f.SourcePriority, f.DestinationVlan, f.DestinationPriority)
+	type X ExtendedSwitchFlow
+	x := X(f)
+	return fmt.Sprintf("ExtendedSwitchFlow: %+v", x)
 }
 
 // RecordType returns the type of flow record.
