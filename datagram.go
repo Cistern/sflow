@@ -17,13 +17,7 @@ type Datagram struct {
 }
 
 func (d Datagram) String() string {
-	str := fmt.Sprintf(`Datagram: Version: %d, IpVersion: %d, IpAddress: %v, SubAgentId: %d, SequenceNumber: %d, Uptime: %d
-Samples:`, d.Version, d.IpVersion, d.IpAddress, d.SubAgentId, d.SequenceNumber, d.Uptime)
-	for _, r := range d.Samples {
-		switch t := r.(type) {
-		default:
-			str += fmt.Sprintf("\n	%v", t)
-		}
-	}
-	return str
+	type X Datagram
+	x := X(d)
+	return fmt.Sprintf("Datagram: %+v", x)
 }
