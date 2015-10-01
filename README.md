@@ -1,4 +1,4 @@
-sflow [![Circle CI](https://circleci.com/gh/PreetamJinka/sflow.svg?style=svg)](https://circleci.com/gh/PreetamJinka/sflow) [![GoDoc](https://godoc.org/github.com/PreetamJinka/sflow?status.svg)](https://godoc.org/github.com/PreetamJinka/sflow) [![BSD License](https://img.shields.io/pypi/l/Django.svg)](https://github.com/PreetamJinka/sflow/blob/master/LICENSE)
+sflow [![Circle CI](https://circleci.com/gh/Preetam/sflow.svg?style=svg)](https://circleci.com/gh/Preetam/sflow) [![GoDoc](https://godoc.org/github.com/PreetamJinka/sflow?status.svg)](https://godoc.org/github.com/PreetamJinka/sflow) [![BSD License](https://img.shields.io/pypi/l/Django.svg)](https://github.com/PreetamJinka/sflow/blob/master/LICENSE)
 ====
 
 An [sFlow](http://sflow.org/) v5 encoding and decoding package for Go.
