@@ -2,6 +2,7 @@ package sflow
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 )
@@ -63,6 +64,9 @@ func decodeRawPacketFlow(r io.Reader) (RawPacketFlow, error) {
 	err = binary.Read(r, binary.BigEndian, &f.HeaderSize)
 	if err != nil {
 		return f, err
+	}
+	if f.HeaderSize > MaximumHeaderLength {
+		return f, errors.New("Header length more than " + string(MaximumHeaderLength) + ": " + string(f.HeaderSize))
 	}
 
 	padding := (4 - f.HeaderSize) % 4
