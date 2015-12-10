@@ -15,8 +15,9 @@ const (
 
 	// MaximumHeaderLength defines the maximum length in bytes, acceptable for packet flow samples while decoding.
 	// This maximum prevents from excessive memory allocation for decoding.
-	// The value is set to maximum transmission unit (MTU), as the header of a network packet may not exceed the MTU.
-	MaximumHeaderLength = 1500
+	// The value is derived from INM_MAX_HEADER_SIZE 256 in sflow reference implementation
+	// https://github.com/sflow/sflowtool/blob/bd3df6e11bdf8261a42734c619abfe8b46e1202f/src/sflowtool.h#L28
+	MaximumHeaderLength = 256
 )
 
 var ErrUnsupportedDatagramVersion = errors.New("sflow: unsupported datagram version")
