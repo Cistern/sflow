@@ -94,6 +94,9 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 		if err != nil {
 			return nil, err
 		}
+		if length > MaximumRecordLength {
+			return nil, errors.New("Record length more than " + string(MaximumRecordLength) + ": " + string(length))
+		}
 
 		var rec Record
 
