@@ -2,7 +2,6 @@ package sflow
 
 import (
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 )
@@ -66,7 +65,8 @@ func decodeRawPacketFlow(r io.Reader) (RawPacketFlow, error) {
 		return f, err
 	}
 	if f.HeaderSize > MaximumHeaderLength {
-		return f, errors.New("Header length more than " + string(MaximumHeaderLength) + ": " + string(f.HeaderSize))
+		return f, fmt.Errorf("sflow: header length more than %d: %d",
+			MaximumHeaderLength, f.HeaderSize)
 	}
 
 	padding := (4 - f.HeaderSize) % 4
