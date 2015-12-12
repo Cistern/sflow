@@ -7,15 +7,16 @@ import (
 )
 
 const (
-	// MaximumRecordLength defines the maximum length in bytes, acceptable for records while decoding.
-	// This maximum prevents from excessive memory allocation for decoding.
-	// The value is derived from MAX_PKT_SIZ 65536 in sflow reference implementation
-	// https://github.com/sflow/sflowtool/blob/bd3df6e11bdf8261a42734c619abfe8b46e1202f/src/sflowtool.c#L4313
+	// MaximumRecordLength defines the maximum length acceptable for decoded records.
+	// This maximum prevents from excessive memory allocation.
+	// The value is derived from MAX_PKT_SIZ 65536 in the reference sFlow implementation
+	// https://github.com/sflow/sflowtool/blob/bd3df6e11bdf/src/sflowtool.c#L4313.
 	MaximumRecordLength = 65536
 
-	// MaximumHeaderLength defines the maximum length in bytes, acceptable for packet flow samples while decoding.
-	// This maximum prevents from excessive memory allocation for decoding.
-	// The value is set to maximum transmission unit (MTU), as the header of a network packet may not exceed the MTU.
+	// MaximumHeaderLength defines the maximum length acceptable for decoded flow samples.
+	// This maximum prevents from excessive memory allocation.
+	// The value is set to maximum transmission unit (MTU), as the header of a network packet
+	// may not exceed the MTU.
 	MaximumHeaderLength = 1500
 )
 
