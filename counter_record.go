@@ -2,9 +2,31 @@ package sflow
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
 	"unsafe"
+)
+
+const (
+	TypeGenericInterfaceCountersRecord = 1
+	TypeEthernetCountersRecord         = 2
+	TypeTokenRingCountersRecord        = 3
+	TypeVgCountersRecord               = 4
+	TypeVlanCountersRecord             = 5
+
+	TypeProcessorCountersRecord  = 1001
+	TypeHostCPUCountersRecord    = 2003
+	TypeHostMemoryCountersRecord = 2004
+	TypeHostDiskCountersRecord   = 2005
+	TypeHostNetCountersRecord    = 2006
+
+	// Custom (Enterprise) types
+	TypeApplicationCountersRecord = (1)<<12 + 1
+)
+
+var (
+	ErrUnknownCounterRecordType = errors.New("sflow: Unknown counter record type")
 )
 
 // GenericInterfaceCounters is a generic switch counters record.
@@ -711,6 +733,87 @@ func decodeHostNetCountersRecord(r io.Reader, length uint32) (HostNetCounters, e
 	}
 
 	return c, readFields(b, fields)
+}
+
+func decodeCounterRecord(r io.ReadSeeker) (Record, error) {
+	format, length := uint32(0), uint32(0)
+
+	var err error
+	err = binary.Read(r, binary.BigEndian, &format)
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Read(r, binary.BigEndian, &length)
+	if err != nil {
+		return nil, err
+	}
+	if length > MaximumRecordLength {
+		return nil, fmt.Errorf("sflow: record length more than %d: %d",
+			MaximumRecordLength, length)
+	}
+
+	var rec Record
+
+	switch format {
+	case TypeGenericInterfaceCountersRecord:
+		rec, err = decodeGenericInterfaceCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeEthernetCountersRecord:
+		rec, err = decodeEthernetCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeTokenRingCountersRecord:
+		rec, err = decodeTokenRingCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeVgCountersRecord:
+		rec, err = decodeVgCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeVlanCountersRecord:
+		rec, err = decodeVlanCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeProcessorCountersRecord:
+		rec, err = decodeProcessorCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeHostCPUCountersRecord:
+		rec, err = decodeHostCPUCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeHostMemoryCountersRecord:
+		rec, err = decodeHostMemoryCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeHostDiskCountersRecord:
+		rec, err = decodeHostDiskCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	case TypeHostNetCountersRecord:
+		rec, err = decodeHostNetCountersRecord(r, length)
+		if err != nil {
+			return nil, err
+		}
+	default:
+		_, err := r.Seek(int64(length), 1)
+		if err != nil {
+			return nil, err
+		}
+		return nil, ErrUnknownCounterRecordType
+	}
+	return rec, nil
 }
 
 func (c HostNetCounters) encode(w io.Writer) error {

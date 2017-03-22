@@ -43,6 +43,12 @@ func decodeSample(r io.ReadSeeker) (Sample, error) {
 	case TypeFlowSample:
 		return decodeFlowSample(r)
 
+	case TypeExpandedFlowSample:
+		return decodeExpandedFlowSample(r)
+
+	case TypeExpandedCounterSample:
+		return decodeExpandedCounterSample(r)
+
 	default:
 		_, err = r.Seek(int64(length), 1)
 		if err != nil {

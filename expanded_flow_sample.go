@@ -3,41 +3,42 @@ package sflow
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 )
 
-type FlowSample struct {
+type ExpandedFlowSample struct {
 	SequenceNum      uint32
-	SourceIdType     byte
-	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
+	SourceIdType     uint32
+	SourceIdIndexVal uint32
 	SamplingRate     uint32
 	SamplePool       uint32
 	Drops            uint32
-	Input            uint32
-	Output           uint32
+	InputFormat      uint32
+	InputValue       uint32
+	OutputFormat     uint32
+	OutputValue      uint32
 	numRecords       uint32
 	Records          []Record
 }
 
-func (s FlowSample) String() string {
-	type X FlowSample
+func (s ExpandedFlowSample) String() string {
+	type X ExpandedFlowSample
 	x := X(s)
-	return fmt.Sprintf("FlowSample: %+v", x)
+	return fmt.Sprintf("ExpandedFlowSample: %+v", x)
 }
 
 // SampleType returns the type of sFlow sample.
-func (s *FlowSample) SampleType() int {
-	return TypeFlowSample
+func (s *ExpandedFlowSample) SampleType() int {
+	return TypeExpandedFlowSample
 }
 
-func (s *FlowSample) GetRecords() []Record {
+func (s *ExpandedFlowSample) GetRecords() []Record {
 	return s.Records
 }
 
-func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
-	s := &FlowSample{}
+func decodeExpandedFlowSample(r io.ReadSeeker) (Sample, error) {
+	s := &ExpandedFlowSample{}
 
 	var err error
 
@@ -51,19 +52,10 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
-	var srcIdIndexVal [3]byte
-	n, err := r.Read(srcIdIndexVal[:])
+	err = binary.Read(r, binary.BigEndian, &s.SourceIdIndexVal)
 	if err != nil {
 		return nil, err
 	}
-
-	if n != 3 {
-		return nil, errors.New("sflow: counter sample decoding error")
-	}
-
-	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
-		uint32(srcIdIndexVal[1]<<8) |
-		uint32(srcIdIndexVal[0]<<16)
 
 	err = binary.Read(r, binary.BigEndian, &s.SamplingRate)
 	if err != nil {
@@ -80,12 +72,22 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
-	err = binary.Read(r, binary.BigEndian, &s.Input)
+	err = binary.Read(r, binary.BigEndian, &s.InputFormat)
 	if err != nil {
 		return nil, err
 	}
 
-	err = binary.Read(r, binary.BigEndian, &s.Output)
+	err = binary.Read(r, binary.BigEndian, &s.InputValue)
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Read(r, binary.BigEndian, &s.OutputFormat)
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Read(r, binary.BigEndian, &s.OutputValue)
 	if err != nil {
 		return nil, err
 	}
@@ -94,12 +96,11 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 	if err != nil {
 		return nil, err
 	}
-
 	for i := uint32(0); i < s.numRecords; i++ {
 		var rec Record
 		rec, err = decodeFlowRecord(r)
 		if err != nil {
-			return nil, err
+
 		} else {
 			s.Records = append(s.Records, rec)
 		}
@@ -107,7 +108,7 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 	return s, nil
 }
 
-func (s *FlowSample) encode(w io.Writer) error {
+func (s *ExpandedFlowSample) encode(w io.Writer) error {
 	var err error
 
 	// We first need to encode the records.
@@ -155,11 +156,19 @@ func (s *FlowSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian, s.Input)
+	err = binary.Write(w, binary.BigEndian, s.InputFormat)
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian, s.Output)
+	err = binary.Write(w, binary.BigEndian, s.InputValue)
+	if err != nil {
+		return err
+	}
+	err = binary.Write(w, binary.BigEndian, s.OutputFormat)
+	if err != nil {
+		return err
+	}
+	err = binary.Write(w, binary.BigEndian, s.OutputValue)
 	if err != nil {
 		return err
 	}

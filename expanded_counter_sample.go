@@ -3,36 +3,35 @@ package sflow
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 )
 
-type CounterSample struct {
+type ExpandedCounterSample struct {
 	SequenceNum      uint32
-	SourceIdType     byte
-	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
+	SourceIdType     uint32
+	SourceIdIndexVal uint32
 	numRecords       uint32
 	Records          []Record
 }
 
-func (s CounterSample) String() string {
-	type X CounterSample
+func (s ExpandedCounterSample) String() string {
+	type X ExpandedCounterSample
 	x := X(s)
-	return fmt.Sprintf("CounterSample: %+v", x)
+	return fmt.Sprintf("ExpandedCounterSample: %+v", x)
 }
 
 // SampleType returns the type of sFlow sample.
-func (s *CounterSample) SampleType() int {
-	return TypeCounterSample
+func (s *ExpandedCounterSample) SampleType() int {
+	return TypeExpandedCounterSample
 }
 
-func (s *CounterSample) GetRecords() []Record {
+func (s *ExpandedCounterSample) GetRecords() []Record {
 	return s.Records
 }
 
-func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
-	s := &CounterSample{}
+func decodeExpandedCounterSample(r io.ReadSeeker) (Sample, error) {
+	s := &ExpandedCounterSample{}
 
 	var err error
 
@@ -46,30 +45,20 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
-	var srcIdIndexVal [3]byte
-	n, err := r.Read(srcIdIndexVal[:])
+	err = binary.Read(r, binary.BigEndian, &s.SourceIdIndexVal)
 	if err != nil {
 		return nil, err
 	}
-
-	if n != 3 {
-		return nil, errors.New("sflow: counter sample decoding error")
-	}
-
-	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
-		uint32(srcIdIndexVal[1]<<8) |
-		uint32(srcIdIndexVal[0]<<16)
 
 	err = binary.Read(r, binary.BigEndian, &s.numRecords)
 	if err != nil {
 		return nil, err
 	}
-
 	for i := uint32(0); i < s.numRecords; i++ {
 		var rec Record
 		rec, err := decodeCounterRecord(r)
 		if err != nil {
-			return nil, err
+
 		} else {
 			s.Records = append(s.Records, rec)
 		}
@@ -77,7 +66,7 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 	return s, nil
 }
 
-func (s *CounterSample) encode(w io.Writer) error {
+func (s *ExpandedCounterSample) encode(w io.Writer) error {
 	var err error
 
 	// We first need to encode the records.
@@ -91,7 +80,7 @@ func (s *CounterSample) encode(w io.Writer) error {
 	}
 
 	// Fields
-	encodedSampleSize := uint32(4 + 1 + 3 + 4)
+	encodedSampleSize := uint32(4 + 4 + 4 + 4)
 
 	// Encoded records
 	encodedSampleSize += uint32(buf.Len())
@@ -108,13 +97,15 @@ func (s *CounterSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian,
-		uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
+	err = binary.Write(w, binary.BigEndian, s.SourceIdType)
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian,
-		uint32(len(s.Records)))
+	err = binary.Write(w, binary.BigEndian, s.SourceIdIndexVal)
+	if err != nil {
+		return err
+	}
+	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}

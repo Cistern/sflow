@@ -2,8 +2,33 @@ package sflow
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"io"
+)
+
+const (
+	TypeRawPacketFlowRecord     = 1
+	TypeEthernetFrameFlowRecord = 2
+	TypeIpv4FlowRecord          = 3
+	TypeIpv6FlowRecord          = 4
+
+	TypeExtendedSwitchFlowRecord     = 1001
+	TypeExtendedRouterFlowRecord     = 1002
+	TypeExtendedGatewayFlowRecord    = 1003
+	TypeExtendedUserFlowRecord       = 1004
+	TypeExtendedUrlFlowRecord        = 1005
+	TypeExtendedMlpsFlowRecord       = 1006
+	TypeExtendedNatFlowRecord        = 1007
+	TypeExtendedMlpsTunnelFlowRecord = 1008
+	TypeExtendedMlpsVcFlowRecord     = 1009
+	TypeExtendedMlpsFecFlowRecord    = 1010
+	TypeExtendedMlpsLvpFecFlowRecord = 1011
+	TypeExtendedVlanFlowRecord       = 1012
+)
+
+var (
+	ErrUnknownFlowRecordType = errors.New("sflow: Unknown flow record type")
 )
 
 // RawPacketFlow is a raw Ethernet header flow record.
@@ -148,6 +173,44 @@ func decodedExtendedSwitchFlow(r io.Reader) (ExtendedSwitchFlow, error) {
 	err := binary.Read(r, binary.BigEndian, &f)
 
 	return f, err
+}
+
+func decodeFlowRecord(r io.ReadSeeker) (Record, error) {
+	format, length := uint32(0), uint32(0)
+
+	var err error
+	err = binary.Read(r, binary.BigEndian, &format)
+	if err != nil {
+		return nil, err
+	}
+
+	err = binary.Read(r, binary.BigEndian, &length)
+	if err != nil {
+		return nil, err
+	}
+
+	var rec Record
+
+	switch format {
+	case TypeRawPacketFlowRecord:
+		rec, err = decodeRawPacketFlow(r)
+		if err != nil {
+			return nil, err
+		}
+	case TypeExtendedSwitchFlowRecord:
+		rec, err = decodedExtendedSwitchFlow(r)
+		if err != nil {
+			return nil, err
+		}
+
+	default:
+		_, err := r.Seek(int64(length), 1)
+		if err != nil {
+			return nil, err
+		}
+		return nil, ErrUnknownFlowRecordType
+	}
+	return rec, nil
 }
 
 func (f ExtendedSwitchFlow) encode(w io.Writer) error {
