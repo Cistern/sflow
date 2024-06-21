@@ -187,3 +187,35 @@ func FuzzDecode(f *testing.F) {
 		}
 	})
 }
+
+func TestDecodeEventDiscardedPacket(t *testing.T) {
+	f, err := os.Open("_test/event_discarded_packet.dump")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	d := NewDecoder(f)
+
+	dgram, err := d.Decode()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if dgram.Version != 5 {
+		t.Errorf("Expected datagram version %v, got %v", 5, dgram.Version)
+	}
+
+	if int(dgram.NumSamples) != len(dgram.Samples) {
+		t.Fatalf("expected NumSamples to be %d, but len(Samples) is %d", dgram.NumSamples, len(dgram.Samples))
+	}
+
+	if len(dgram.Samples) != 1 {
+		t.Fatalf("expected 1 sample, got %d", len(dgram.Samples))
+	}
+
+	_, ok := dgram.Samples[0].(*EventDiscardedPacket)
+	if !ok {
+		t.Fatalf("expected a EventDiscardedPacket, got %T", dgram.Samples[0])
+	}
+
+}

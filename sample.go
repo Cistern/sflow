@@ -11,6 +11,7 @@ const (
 	TypeCounterSample         = 2
 	TypeExpandedFlowSample    = 3
 	TypeExpandedCounterSample = 4
+	TypeEventDiscardedPacket  = 5
 )
 
 var (
@@ -42,6 +43,9 @@ func decodeSample(r io.ReadSeeker) (Sample, error) {
 
 	case TypeFlowSample:
 		return decodeFlowSample(r)
+
+	case TypeEventDiscardedPacket:
+		return decodEventDiscardedPacket(r)
 
 	default:
 		_, err = r.Seek(int64(length), 1)
