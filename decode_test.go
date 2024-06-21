@@ -1,6 +1,7 @@
 package sflow
 
 import (
+	"bytes"
 	"os"
 	"testing"
 )
@@ -172,4 +173,17 @@ func TestDecodeFlow1(t *testing.T) {
 	if rec.HeaderSize != 128 {
 		t.Errorf("expected FrameLength to be 128, got %d", rec.HeaderSize)
 	}
+}
+
+func FuzzDecode(f *testing.F) {
+	testcases := []string{"Hello, world", " ", "!12345"}
+	for _, tc := range testcases {
+		f.Add(tc)
+	}
+	f.Fuzz(func(t *testing.T, data string) {
+		d := NewDecoder(bytes.NewReader([]byte(data)))
+		if _, err := d.Decode(); err == nil {
+			t.Errorf("random data decode ok")
+		}
+	})
 }
