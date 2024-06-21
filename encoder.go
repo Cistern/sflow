@@ -30,7 +30,7 @@ func NewEncoder(source net.IP, subAgentId uint32, initialSequenceNumber uint32) 
 // Encode encodes an sFlow v5 datagram with the given samples and
 // writes the packet to w.
 func (e *Encoder) Encode(w io.Writer, samples []Sample) error {
-	if samples == nil || len(samples) == 0 {
+	if len(samples) == 0 {
 		return ErrNoSamplesProvided
 	}
 

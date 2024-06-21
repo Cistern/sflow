@@ -74,8 +74,8 @@ func decodeCounterSample(r io.ReadSeeker) (Sample, error) {
 	}
 
 	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
-		uint32(srcIdIndexVal[1]<<8) |
-		uint32(srcIdIndexVal[0]<<16)
+		uint32(srcIdIndexVal[1])<<8 |
+		uint32(srcIdIndexVal[0])<<16
 
 	err = binary.Read(r, binary.BigEndian, &s.numRecords)
 	if err != nil {

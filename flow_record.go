@@ -69,12 +69,12 @@ func decodeRawPacketFlow(r io.Reader) (RawPacketFlow, error) {
 			MaximumHeaderLength, f.HeaderSize)
 	}
 
-	padding := (4 - f.HeaderSize) % 4
+	padding := (4 - int(f.HeaderSize)) % 4
 	if padding < 0 {
 		padding += 4
 	}
 
-	f.Header = make([]byte, f.HeaderSize+padding)
+	f.Header = make([]byte, f.HeaderSize+uint32(padding))
 
 	_, err = r.Read(f.Header)
 	if err != nil {
@@ -100,12 +100,12 @@ func (f RawPacketFlow) encode(w io.Writer) error {
 	encodedRecordLength := uint32(4 * 4) // 4 32-bit records
 
 	// Add the length of the header padded to a multiple of 4 bytes.
-	padding := (4 - f.HeaderSize) % 4
+	padding := (4 - int(f.HeaderSize)) % 4
 	if padding < 0 {
 		padding += 4
 	}
 
-	encodedRecordLength += f.HeaderSize + padding
+	encodedRecordLength += f.HeaderSize + uint32(padding)
 
 	err = binary.Write(w, binary.BigEndian, encodedRecordLength)
 	if err != nil {
