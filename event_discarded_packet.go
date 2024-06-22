@@ -3,61 +3,39 @@ package sflow
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"fmt"
 	"io"
 )
 
-const (
-	TypeRawPacketFlowRecord     = 1
-	TypeEthernetFrameFlowRecord = 2
-	TypeIpv4FlowRecord          = 3
-	TypeIpv6FlowRecord          = 4
-
-	TypeExtendedSwitchFlowRecord     = 1001
-	TypeExtendedRouterFlowRecord     = 1002
-	TypeExtendedGatewayFlowRecord    = 1003
-	TypeExtendedUserFlowRecord       = 1004
-	TypeExtendedUrlFlowRecord        = 1005
-	TypeExtendedMlpsFlowRecord       = 1006
-	TypeExtendedNatFlowRecord        = 1007
-	TypeExtendedMlpsTunnelFlowRecord = 1008
-	TypeExtendedMlpsVcFlowRecord     = 1009
-	TypeExtendedMlpsFecFlowRecord    = 1010
-	TypeExtendedMlpsLvpFecFlowRecord = 1011
-	TypeExtendedVlanFlowRecord       = 1012
-)
-
-type FlowSample struct {
-	SequenceNum      uint32
-	SourceIdType     byte
-	SourceIdIndexVal uint32 // NOTE: this is 3 bytes in the datagram
-	SamplingRate     uint32
-	SamplePool       uint32
-	Drops            uint32
-	Input            uint32
-	Output           uint32
-	numRecords       uint32
-	Records          []Record
+type EventDiscardedPacket struct {
+	SequenceNum uint32
+	DsClass     uint32
+	DsIndex     uint32
+	Drops       uint32
+	Input       uint32
+	Output      uint32
+	Reason      uint32
+	numRecords  uint32
+	Records     []Record
 }
 
-func (s FlowSample) String() string {
-	type X FlowSample
+func (s EventDiscardedPacket) String() string {
+	type X EventDiscardedPacket
 	x := X(s)
-	return fmt.Sprintf("FlowSample: %+v", x)
+	return fmt.Sprintf("EventDiscardedPacket: %+v", x)
 }
 
 // SampleType returns the type of sFlow sample.
-func (s *FlowSample) SampleType() int {
-	return TypeFlowSample
+func (s *EventDiscardedPacket) SampleType() int {
+	return TypeEventDiscardedPacket
 }
 
-func (s *FlowSample) GetRecords() []Record {
+func (s *EventDiscardedPacket) GetRecords() []Record {
 	return s.Records
 }
 
-func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
-	s := &FlowSample{}
+func decodEventDiscardedPacket(r io.ReadSeeker) (Sample, error) {
+	s := &EventDiscardedPacket{}
 
 	var err error
 
@@ -66,31 +44,12 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
-	err = binary.Read(r, binary.BigEndian, &s.SourceIdType)
+	err = binary.Read(r, binary.BigEndian, &s.DsClass)
 	if err != nil {
 		return nil, err
 	}
 
-	var srcIdIndexVal [3]byte
-	n, err := r.Read(srcIdIndexVal[:])
-	if err != nil {
-		return nil, err
-	}
-
-	if n != 3 {
-		return nil, errors.New("sflow: counter sample decoding error")
-	}
-
-	s.SourceIdIndexVal = uint32(srcIdIndexVal[2]) |
-		uint32(srcIdIndexVal[1])<<8 |
-		uint32(srcIdIndexVal[0])<<16
-
-	err = binary.Read(r, binary.BigEndian, &s.SamplingRate)
-	if err != nil {
-		return nil, err
-	}
-
-	err = binary.Read(r, binary.BigEndian, &s.SamplePool)
+	err = binary.Read(r, binary.BigEndian, &s.DsIndex)
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +69,14 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		return nil, err
 	}
 
+	err = binary.Read(r, binary.BigEndian, &s.Reason)
+	if err != nil {
+		return nil, fmt.Errorf("read reson %v", err)
+	}
+
 	err = binary.Read(r, binary.BigEndian, &s.numRecords)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("read numRecords %v", err)
 	}
 
 	for i := uint32(0); i < s.numRecords; i++ {
@@ -120,12 +84,12 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 
 		err = binary.Read(r, binary.BigEndian, &format)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("read record format %d %v", i, err)
 		}
 
 		err = binary.Read(r, binary.BigEndian, &length)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("read record length %d %v", i, err)
 		}
 
 		var rec Record
@@ -134,18 +98,18 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 		case TypeRawPacketFlowRecord:
 			rec, err = decodeRawPacketFlow(r)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("read record flow %d %v", i, err)
 			}
 		case TypeExtendedSwitchFlowRecord:
 			rec, err = decodedExtendedSwitchFlow(r)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("read record switch flow %d %v", i, err)
 			}
 
 		default:
 			_, err := r.Seek(int64(length), 1)
 			if err != nil {
-				return nil, err
+				return nil, fmt.Errorf("read record seek %d %v", i, err)
 			}
 
 			continue
@@ -157,7 +121,7 @@ func decodeFlowSample(r io.ReadSeeker) (Sample, error) {
 	return s, nil
 }
 
-func (s *FlowSample) encode(w io.Writer) error {
+func (s *EventDiscardedPacket) encode(w io.Writer) error {
 	var err error
 
 	// We first need to encode the records.
@@ -171,7 +135,7 @@ func (s *FlowSample) encode(w io.Writer) error {
 	}
 
 	// Fields
-	encodedSampleSize := uint32(4 + 1 + 3 + 4 + 4 + 4 + 4 + 4 + 4)
+	encodedSampleSize := uint32(4 * 8)
 
 	// Encoded records
 	encodedSampleSize += uint32(buf.Len())
@@ -188,16 +152,11 @@ func (s *FlowSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian,
-		uint32(s.SourceIdType)|s.SourceIdIndexVal<<24)
+	err = binary.Write(w, binary.BigEndian, s.DsClass)
 	if err != nil {
 		return err
 	}
-	err = binary.Write(w, binary.BigEndian, s.SamplingRate)
-	if err != nil {
-		return err
-	}
-	err = binary.Write(w, binary.BigEndian, s.SamplePool)
+	err = binary.Write(w, binary.BigEndian, s.DsIndex)
 	if err != nil {
 		return err
 	}
@@ -213,11 +172,14 @@ func (s *FlowSample) encode(w io.Writer) error {
 	if err != nil {
 		return err
 	}
+	err = binary.Write(w, binary.BigEndian, s.Reason)
+	if err != nil {
+		return err
+	}
 	err = binary.Write(w, binary.BigEndian, uint32(len(s.Records)))
 	if err != nil {
 		return err
 	}
-
 	_, err = io.Copy(w, buf)
 	return err
 }
